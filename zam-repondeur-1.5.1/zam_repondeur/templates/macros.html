@@ -1,0 +1,90 @@
+{% macro status(amendement) %}
+    {% if amendement.is_abandoned_before_seance %}
+        {% if amendement.is_withdrawn %}
+            <span class="status grey">Retiré</span>
+        {% elif amendement.is_irrecevable %}
+            <span class="status grey">Irrecevable</span>
+        {% endif %}
+    {% elif amendement.gouvernemental %}
+        <span class="status blue">Gouvernemental</span>
+    {% endif %}
+{% endmacro %}
+
+{% macro user_activity(user) %}
+    {% if user.is_active %}
+        <nobr class="user active" title="Activité dans les {{ user.INACTIVE_AFTER }} dernières minutes"><span class="activity"></span> {{ user.name }} <span class="email">({{ user.email }})</span></nobr>
+    {% else %}
+        <nobr class="user inactive" title="Inactivité dans les {{ user.INACTIVE_AFTER }} dernières minutes"><span class="activity"></span> {{ user.name }} <span class="email">({{ user.email }})</span></nobr>
+    {% endif %}
+{% endmacro %}
+
+{% macro timeline(events, today) %}
+    <div class="container timeline">
+        {% for key, events in events|group_by_day %}
+            <h3>
+                {% if key == today %}
+                    Aujourd’hui
+                {% else %}
+                    {{ key.strftime("%d %B") }}
+                {% endif %}
+            </h3>
+            <ul>
+            {% set outer_loop = loop %}
+            {% for event in events %}
+                {{ journal_line(outer_loop.first and loop.first, event) }}
+            {% endfor %}
+            </ul>
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+{% macro journal_line(is_first, event) %}
+    <li>
+        <em class="when">
+            <time title="{{ event.created_at | human_readable_date_and_time }}"
+                datetime="{{ event.created_at.isoformat(timespec='milliseconds') }}"
+                >
+                    {{ event.created_at | human_readable_time }}
+            </time>
+        </em>
+        <span class="icon">
+            {% if event.icon %}
+                <i class="icon-{{ event.icon }}"></i>
+            {% endif %}
+        </span>
+        <div class="what">
+            {% set details = event.render_details() %}
+            {% if details %}
+                <details {% if is_first %}open{% endif %}>
+                    <summary>{{ event.render_summary() }}</summary>
+                    <p>{{ details }}</p>
+                </details>
+            {% else %}
+                <p>{{ event.render_summary() }}</p>
+            {% endif %}
+        </div>
+    </li>
+{% endmacro %}
+
+{% macro svg_icon(name, class="") %}
+    <svg class="icon {{ class }}" aria-hidden="true">
+        <use xlink:href="#{{ name }}"></use>
+    </svg>
+{% endmacro %}
+
+{% macro numero_amendement(amendement) %}
+    {% if amendement.location.batch %}
+        N<sup>os</sup>&nbsp;
+        {%- for amdt in amendement.location.batch.amendements[:-1] -%}
+            {{ link_amendement(amdt) }}
+            {%- if not loop.last %}, {% endif %}
+        {%- endfor %}
+        et {{ link_amendement(amendement.location.batch.amendements[-1]) }}
+    {% else %}
+        Nº&nbsp;{{ link_amendement(amendement) }}
+    {% endif %}
+{% endmacro %}
+
+{% macro link_amendement(amendement) -%}
+    <a href="{{ request.resource_url(context['amendements'][amendement.num_str], 'amendement_edit') }}">{{ amendement }}</a>
+{%- endmacro %}

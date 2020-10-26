@@ -1,0 +1,83 @@
+{% extends "_base.html" %}
+
+{% block header %}
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/selectize/css/selectize.css') }}">
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/selectize/css/selectize.bootstrap3.css') }}">
+    <style type="text/css">
+        h2 {
+            text-align: center;
+            margin: 2.5rem 0 1.5rem 0;
+            font-weight: 600;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+
+<h2>Spécification import réponses</h2>
+
+<p>Pour rappel, le chargement d'un tableau de réponses est l'alternative à la saisie manuelle des réponses dans l'outil et permet d'associer en un seul coup plusieurs objets, avis, réponses à plusieurs amendements et/ou à les placer directement sur un espace de travail / dans une Corbeille.</p>
+
+<p>Vous pouvez y accéder via le lien « Options avancées » présent dans le menu contextuel depuis le dérouleur (ou toute autre page de la lecture) :</p>
+
+<p><img width="auto" src="{{ request.static_url('zam_repondeur:static/img/aide_import/image1.png') }}"></p>
+
+<p>Le fichier CSV doit répondre à deux contraintes afin d'être « compris » par l'outil.</p>
+
+<p>A noter : si vous avez déjà reçu des amendements, exporter un tableau excel de SIGNALE peut utilement servir de base pour la création d'un tableau d'import car toutes les colonnes dont il est question ci-dessous sont déjà présentes dans l'export.</p>
+
+<h3>Les colonnes obligatoires du tableau</h3>
+
+<p>Le tableau doit comprendre (au moins) 4 colonnes. Elles peuvent être vides, mais doivent être présentes, c'est-à-dire qu'à la première ligne du tableau, on trouve au moins 4 titres de colonnes, qui correspondent à ceux ci-dessous :</p>
+
+<ul>
+  <li>la colonne "Num amdt" contenant le numéro des amendements ; elle doit être libellée exactement comme ceci : <code>Num amdt</code> ; elle comporte uniquement des numéros sous forme de chiffres (pas de lettre donc notamment pas de mention relative à la rectification éventuelle de l'amendement, pas d'espace)</li>
+  <li>la colonne "Objet amdt" contenant traditionnellement la reformulation en une phrase courte du contenu de l'amendement ; elle doit être libellée exactement comme ceci : <code>Objet amdt</code> ; elle comporte du texte (chiffres, lettres et ponctuation... pas d'interdit particulier)</li>
+  <li>la colonne "Avis du Gouvernement" contenant la position sur l'amendement ; elle doit être libellée exactement comme ceci : <code>Avis du Gouvernement</code> ; elle comporte forcément l'un des 9 avis possibles, écrits exactement comme ceci (respecter les majuscules, les accents, les espaces) : <code>Favorable</code> ; <code>Défavorable</code> ; <code>Favorable sous réserve de</code> ; <code>Retrait</code> ; <code>Retrait au profit de</code> ; <code>Retrait sinon rejet</code> ; <code>Retrait sous réserve de</code> ; <code>Sagesse</code> ; <code>Satisfait donc rejet</code></li>
+  <li>la colonne "Réponse" contenant les éléments de réponse appuyant l'avis ; elle doit être libellée exactement comme ceci : <code>Réponse</code> ; elle comporte du texte (chiffres, lettres et ponctuation... pas d'interdit particulier)</li>
+</ul>
+
+<p>NB : si le contenu de la colonne réponse est vide (mais que le titre de colonne est présent), l'outil récupèrera l'avis mais laissera vide le champ réponse.</p>
+
+<p>NB : si d'autres colonnes que ces quatre-là sont présentes dans le tableau, cela n’a pas d’impact, le chargement se déroulera quand même.</p>
+
+<p>On qualifie ces colonnes d'obligatoires car il est nécessaire qu'elles soient présentes dans le tableau pour que l'import passe, c'est-à-dire pour que l'outil comprenne le tableau. Comme indiqué ci-dessus, leur contenu peut être vide, mais la première ligne du tableau doit obligatoirement contenir ces 4 libellés.</p>
+
+<h3>Les colonnes optionnelles du tableau</h3>
+
+<p>Vous avez la possibilité d'importer des commentaires relatifs à l'amendement. Pour ce faire, la colonne "Commentaires" doit être ajoutée au tableau ; elle doit être libellée exactement comme ceci : <code>Commentaires</code> ; elle comporte du texte (chiffres, lettres et ponctuation... pas d'interdit particulier).</p>
+
+<p>Vous avez également la possibilité d'importer des affectations, donc de placer des amendements sur des espaces de travail ou des Corbeilles (et même de créer des Corbeilles) grâce au tableau.</p>
+
+<p>Pour ce faire, les 3 colonnes "Affectation (email)", "Affectation (nom)" et "Affectation (Corbeille)" doivent être ajoutées au tableau ; elles doivent être libellées exactement comme ceci : <Code>Affectation (email)</code>, <code>Affectation (nom)</code> et <code>Affectation (Corbeille)</code>.</p>
+
+<p>La colonne "Affectation (email)" comporte une adresse courriel valide correspondant à l'adresse de l'espace de travail sur lequel poser l'amendement ; ex : "<a href="mailto:micheline.dupont@ministere.gouv.fr">micheline.dupont@ministere.gouv.fr</a>".</p>
+
+<p><strong>Attention</strong>, l'utilisateur concerné doit avoir été invité à participer au dossier législatif pour pouvoir accéder à son espace de travail.</p>
+
+<p>La colonne "Affectation (nom)" comporte le nom de la personne ; ex : "Micheline Dupont".</p>
+
+<p>Pour poser l'amendement sur l'espace de travail de Micheline Dupont, il suffit de renseigner la colonne "Affectation (email)" (en revanche, le seul remplissage de la colonne "Affectation (nom)" ne suffit pas à poser l'amendement sur l'espace de travail de Micheline). La colonne "Affectation (Corbeille)" comporte l'intitulé de la Corbeille sur laquelle poser l'amendement / la Corbeille à créer ; ex : "contributions externes".</p>
+
+<p>On qualifie ces colonnes d'optionnelles car l'import pourra tout à fait être accepté sans qu'elles soient inclues dans le document et même si aucune cellule ne contient ce libellé dans la première ligne du tableau.</p>
+
+<h3>Le format du tableau</h3>
+
+<p>Si vous partez d'un tableau Excel, il faut le convertir en CSV : pour cela, il suffit de faire un Enregistrer sous et de sélectionner dans la liste le format CSV séparateur point-virgule.</p>
+<p><img width="auto" src="{{ request.static_url('zam_repondeur:static/img/aide_import/image2.png') }}"></p>
+
+<p>En plus du format CSV, il faut s'assurer que le document est enregistré dans le bon encodage. Par défaut, votre document est généralement en encodage ANSI or nous voulons de l'UTF-8. Pour traduire le document dans le bon encodage, il faut passer par le bloc-notes. Ouvrez votre document CSV :</p>
+
+<p><img width="auto" src="{{ request.static_url('zam_repondeur:static/img/aide_import/image3.png') }}"></p>
+
+<p>Faites un Enregistrer sous en sélectionnant l'encodage UTF-8.</p>
+
+<p><img width="auto" src="{{ request.static_url('zam_repondeur:static/img/aide_import/image4.png') }}"></p>
+
+<p>Votre document est prêt à être chargé sur l'outil !</p>
+
+<p>N'hésitez pas à nous contacter (<a href="mailto:{{ request.registry.settings.get('zam.contact_mail') }}">{{ request.registry.settings.get('zam.contact_mail') }}</a>) en cas de question ou problème.
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

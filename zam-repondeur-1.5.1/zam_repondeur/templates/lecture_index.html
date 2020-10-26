@@ -1,0 +1,383 @@
+{% extends "_base_lecture.html" %}
+{% import "macros.html" as macros %}
+
+{% block header %}
+<link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/amendements.css') }}">
+{% endblock %}
+
+{% block body %}
+<svg aria-hidden="true" style="position: absolute; width: 0; height: 0;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+    <symbol id="check" viewBox="0 0 18 14" fill="#000000">
+        <polygon id="Shape" points="6 11.17 1.83 7 0.41 8.41 6 14 18 2 16.59 0.59"></polygon>
+    </symbol>
+    <symbol id="box" viewBox="0 0 28 20" fill="#000000">
+        <path d="M17,4 L0,4 L0,1 C0,0.44771525 1.40419783,1.98951966e-13 3.13636364,1.98951966e-13 L17,1.98951966e-13 L26.5,1.98951966e-13 C27.3284271,1.98951966e-13 28,0.44771525 28,1 L28,4 L17,4 Z M14,7 C13.1519168,6.99544667 12.3453847,6.63214393 11.78,6 L1,6 L1,18 C1,19.1045695 1.8954305,20 3,20 L25,20 C26.1045695,20 27,19.1045695 27,18 L27,6 L16.21,6 C15.6469496,6.62957416 14.8445917,6.99263205 14,7 Z M18,10 C18,10.5522847 17.5522847,11 17,11 L11,11 C10.4477153,11 10,10.5522847 10,10 C10,9.44771525 10.4477153,9 11,9 L17,9 C17.5522847,9 18,9.44771525 18,10 Z"></path>
+    </symbol>
+ </defs>
+</svg>
+
+<h1>Dérouleur des amendements</h1>
+<h2 class="subtitle">{{ lecture.dossier.titre }}</h2>
+<p class="subtitle">{{ lecture }}</p>
+
+<div data-controller="amendement-help">
+    <div class="last-update"
+        data-controller="progress"
+        data-progress-check-url="{{ progress_url }}"
+        data-progress-check-interval="{{ request.registry.settings['zam.progress.lecture_refresh'] }}">
+        Dernière mise à jour :
+        <time datetime="{{ lecture.last_event_datetime.isoformat(timespec='milliseconds') }}"
+            data-controller="timestamp"
+            data-timestamp-modified-at="{{ lecture.last_event_timestamp }}">
+                {{ lecture.last_event_datetime | human_readable_time }}
+        </time>
+        <br>
+        <a class="underlined" href="{{ request.resource_url(context.parent, 'journal') }}">
+            Journal
+        </a>
+        {% if all_amendements %}
+            • <a href="#amendement-help" data-action="amendement-help#toggle">Un problème ?</a>
+        {% endif %}
+    </div>
+
+    {% if all_amendements %}
+        <div class="box notice" id="amendement-help" data-target="amendement-help.content">
+            <a class="close-help" data-action="amendement-help#toggle" href="">×</a>
+            <h3>Vos amendements n’apparaissent pas ? Ou sont mal ordonnés ?</h3>
+            <p>S’ils ne sont pas encore publiés sur le site Internet de l’Assemblée nationale / du Sénat, tout va bien, veuillez patienter.</p>
+            <p>S’ils sont publiés sur le site, c’est un indicateur qu’ils arrivent bientôt sur Signale ! En effet, il est possible que les amendements soient publiés sur le site Internet (ou sur l’intranet parlementaire notamment ELOI) mais qu’ils ne soient pas encore disponibles pour Signale, en particulier lorsqu’il s’agit d’une lecture Assemblée nationale.</p>
+            <p>Si cela vous semble anormalement long, veuillez <a href="{{ request.route_url('aide') }}">consulter la page d’aide dédiée</a> et/ou <a href="mailto:{{ request.registry.settings.get('zam.contact_mail') }}">contacter l’équipe de développement</a> pour solliciter de l’aide.</p>
+        </div>
+    {% endif %}
+</div>
+
+{% set count = all_amendements|length %}
+<div class="content"
+    data-controller="amendements-filters"
+    data-amendements-filters-initial-count="{{ count }}">
+    <div class="options">
+        <a href="">{# Keep the empty link for consistency with flexbox and user table. #}</a>
+        <span data-target="amendements-filters.count">{{ count }} amendements</span>
+    </div>
+
+    <table class="table"
+        data-controller="amendements-selection"
+        data-target="amendements-filters.table">
+        <thead class="box sticky">
+            <tr class="groupActions d-none"
+                data-controller="amendements-backlinks">
+                <th colspan="2">
+                    Actions groupées :
+                </th>
+                <th colspan="2">
+                    <a id="transfer-amendements"
+                        href="{{ request.resource_url(context.parent, 'transfer_amendements', query={'from_index': 1}) }}"
+                        class="button primary"
+                        data-action="amendements-backlinks#update">
+                        Transférer
+                    </a>
+                </th>
+                <th colspan="2">
+                    <a id="export-pdf" href="{{ request.resource_url(context.parent, 'export_pdf') }}" class="button primary">Exporter en PDF</a>
+                </th>
+                <th></th>
+            </tr>
+            <tr class="filters {% if not all_amendements %}d-none{% endif %}"
+                data-target="amendements-filters.row amendements-selection.filters">
+                <th>
+                    <input type="checkbox" name="select-all"
+                        data-action="amendements-selection#selectAll">
+                </th>
+                <th class="article-header">
+                    Article
+                    <br/>
+                    <input type="text" class="form-control form-control-sm"
+                        autocomplete="off" autocorrect="off"
+                        data-action="keyup->amendements-filters#filterArticle"
+                        data-target="amendements-filters.articleInput">
+                </th>
+                {% if lecture.has_missions %}
+                    <th class="mission-header">
+                        Mission
+                        <br/>
+                        <input type="text" class="form-control form-control-sm"
+                            autocomplete="off" autocorrect="off"
+                            data-action="keyup->amendements-filters#filterMission"
+                            data-target="amendements-filters.missionInput">
+                    </th>
+                {% endif %}
+                <th class="amendement-header">
+                    Nº
+                    <br/>
+                    <input type="text" class="form-control form-control-sm"
+                        autocomplete="off" autocorrect="off"
+                        data-action="keyup->amendements-filters#filterAmendement"
+                        data-target="amendements-filters.amendementInput">
+                    <input type="checkbox" id="gouvernemental"
+                        data-action="amendements-filters#filterGouvernemental"
+                        data-target="amendements-filters.gouvernementalCheckbox">
+                    <label for="gouvernemental"
+                        data-target="amendements-filters.gouvernementalLabel">
+                        <abbr class="status blue" title="Afficher seulement les amendements gouvernementaux">Gouv.</abbr>
+                    </label>
+                </th>
+                <th>
+                    Espace de travail/Corbeille
+                    <br/>
+                    <input type="text" class="form-control form-control-sm"
+                        autocomplete="off" autocorrect="off"
+                        data-action="keyup->amendements-filters#filterTable"
+                        data-target="amendements-filters.tableInput">
+                    <input type="checkbox" id="emptytable"
+                        data-action="amendements-filters#filterEmptytable"
+                        data-target="amendements-filters.emptytableCheckbox">
+                    <label for="emptytable"
+                        data-target="amendements-filters.emptytableLabel">
+                        <abbr class="status blue" title="Filtrer les amendements sans table">Vide</abbr>
+                    </label>
+                </th>
+                <th>
+                    Avis
+                </th>
+                <th>
+                    Réponse
+                </th>
+                <th></th>
+            </tr>
+            <tr class="shadow-bottom d-none" data-target="amendements-selection.bottom">
+                <th colspan="{% if lecture.has_missions %}8{% else %}7{% endif %}"></th>
+            </tr>
+        </thead>
+        <tbody data-controller="amendements-backlinks" data-target="amendements-filters.tbody">
+        {% set highlighted_amdt = request.session.pop('highlighted_amdt', None) %}
+        {% for amendement in collapsed_amendements | sort %}
+            {% if loop.previtem is defined and loop.previtem.position and loop.previtem.is_displayable and not amendement.position %}
+                <tr class="limit-derouleur"
+                    {# Empty data attributes to avoid messing up with filters. #}
+                    data-article=""
+                    data-mission=""
+                    data-order=""
+                    data-amendement=""
+                    data-table=""
+                    data-emptytable=""
+                    data-gouvernemental=""
+                    data-abandoned-before-seance="">
+                    <td colspan="{% if lecture.has_missions %}8{% else %}7{% endif %}">
+                        Les amendements en-deçà de cette ligne ne sont pas (encore) présents dans le dérouleur.
+                    </td>
+                </tr>
+            {% endif %}
+            <tr data-article="
+                    {%- if amendement.is_abandoned_before_seance -%}
+                        {{ amendement.VERY_BIG_NUMBER }}
+                    {%- elif amendement.article.type == 'article' -%}
+                        {{ amendement.article.num }} {{ amendement.article.mult }}
+                    {%- else -%}
+                        {{ amendement.article.type }}
+                    {%- endif -%}
+                "
+                {% if lecture.has_missions %}
+                    data-mission="{{ amendement.mission_titre_court and amendement.mission_titre_court.lower() or '' }}"
+                {% endif %}
+                data-order="{{ loop.index }}"
+                data-amendement="
+                {%- if amendement.location.batch -%}
+                    {{ amendement.location.batch.nums|join(',') }}
+                {%- else -%}
+                    {{ amendement.num }}
+                {%- endif -%}
+                "
+                data-table="
+                    {%- if amendement.is_abandoned_before_seance -%}
+                        {%- if amendement.is_withdrawn -%}
+                            Retiré
+                        {%- else -%}
+                            Irrecevable
+                        {%- endif -%}
+                    {%- elif amendement.table_name -%}
+                        {{ amendement.table_name }}
+                    {%- endif -%}
+                "
+                data-emptytable="{{ 1 if not amendement.table_name and not amendement.is_abandoned else 0 }}"
+                data-gouvernemental="{{ 1 if amendement.gouvernemental else 0 }}"
+                data-abandoned-before-seance="{{ 1 if amendement.is_abandoned_before_seance else 0 }}"
+                {% if amendement.slug == highlighted_amdt -%}
+                class="highlighted"
+                {%- endif %}
+                id="{{ amendement.slug }}">
+                <td>
+                    <input type="checkbox" name="amendement-selected" value="{{ amendement.num }}">
+                </td>
+                <td class="article" data-sortkey="
+                    {%- if amendement.is_abandoned_before_seance or amendement.article.is_erreur -%}
+                        {{ amendement.VERY_BIG_NUMBER }}
+                    {%- else -%}
+                        {{ amendement.article.sort_key_as_str }}
+                    {%- endif -%}">
+                    {% if amendement.article.is_erreur %}
+                        ⚠️
+                    {% endif %}
+                    {{ amendement.article }}
+                </td>
+                {% if lecture.has_missions %}
+                    <td class="mission">
+                        {% if amendement.mission_titre %}
+                            <abbr title="{{ amendement.mission_titre }}">
+                                {{ amendement.mission_titre_court }}
+                            </abbr>
+                        {% endif %}
+                    </td>
+                {% endif %}
+                {% set all_identiques = amendement.all_identiques %}
+                {# Given that all_identiques excludes itself, we can use it
+                    directly as a boolean to avoid a lonely identique: #}
+                <td {% if amendement.identique and not amendement.is_abandoned and all_identiques -%}
+                    {% set is_first = loop.previtem is not defined or loop.previtem not in all_identiques %}
+                    {% set is_last = loop.nextitem is not defined or loop.nextitem not in all_identiques %}
+                    class="identique {%- if is_first %} first{% endif %}{% if is_last %} last{% endif %}"
+                    {%- endif %}
+                    data-sortkey="
+                    {%- if amendement.is_abandoned_before_seance -%}
+                        {{ amendement.VERY_BIG_NUMBER }} {# Keep at the end. #}
+                    {%- else -%}
+                        {{ amendement.num }}
+                    {%- endif -%}">
+                    {% if amendement.location.batch %}
+                        {{ amendement.location.batch.amendements|join(', ', attribute='num_disp') }}
+                    {% else %}
+                        {{ amendement.num_disp }}
+                    {% endif %}
+                    {% if amendement.parent %}
+                        (ss-amdt au {{ amendement.parent.num_disp }})
+                    {% endif %}
+                    {% if amendement.is_abandoned_before_seance %}
+                        {% if amendement.is_withdrawn %}
+                            <abbr class="status grey" title="Retiré">Ret.</abbr>
+                        {% elif amendement.is_irrecevable %}
+                            <abbr class="status grey" title="Irrecevable">Irr.</abbr>
+                        {% endif %}
+                    {% elif amendement.is_abandoned_during_seance %}
+                        {% if amendement.is_withdrawn %}
+                            <abbr class="status grey" title="Retiré">Ret.</abbr>
+                        {% elif amendement.is_tombé %}
+                            <abbr class="status grey" title="Tombé">Tombé</abbr>
+                        {% endif %}
+                    {% elif amendement.gouvernemental %}
+                        <abbr class="status blue" title="Gouvernemental">Gouv.</abbr>
+                    {% endif %}
+                </td>
+                <td data-sortkey="
+                    {%- if amendement.is_abandoned_before_seance -%}
+                        ZZZ{# Keep at the end. #}
+                    {%- elif amendement.table_name -%}
+                        {{ amendement.table_name }}
+                    {%- else -%}
+                        YYY{# Keep almost at the end. #}
+                    {%- endif -%}">
+                    {% if amendement.table_name %}
+                        {% if amendement.location.shared_table %}
+                            {{ macros.svg_icon("box") }}
+                        {% endif %}
+                        {{ amendement.table_name }}
+                    {% endif %}
+                </td>
+                <td class="centered {% if not amendement.gouvernemental and not amendement.user_content.avis %}input-required{% endif %}"
+                    data-sortkey="
+                    {%- if amendement.is_abandoned_before_seance -%}
+                        ZZZ{# Keep at the end. #}
+                    {%- elif amendement.gouvernemental -%}
+                        Présentation
+                    {%- elif amendement.user_content.avis -%}
+                        {{ amendement.user_content.avis }}
+                    {%- else -%}
+                        Aucun
+                    {%- endif -%}">
+                    {% if amendement.is_abandoned_before_seance %}
+                        {# No check #}
+                    {% elif amendement.gouvernemental %}
+                        <nobr>
+                            <abbr title="Présentation">{{ macros.svg_icon("check") }}</abbr>
+                        </nobr>
+                    {% elif amendement.user_content.avis %}
+                        <nobr>
+                            <abbr title="{{ amendement.user_content.avis }}">{{ macros.svg_icon("check") }}</abbr>
+                        </nobr>
+                    {% endif %}
+                </td>
+                <td class="centered" data-sortkey="
+                    {%- if amendement.is_abandoned_before_seance -%}
+                        ZZZ{# Keep at the end. #}
+                    {%- elif amendement.user_content.has_reponse -%}
+                        AAA
+                    {%- else -%}
+                        YYY{# Keep almost at the end. #}
+                    {%- endif -%}">
+                    {% if amendement.user_content.has_reponse %}
+                        {{ macros.svg_icon("check") }}
+                    {% endif %}
+                    {% if amendement.identique %}
+                        {% set identiques = amendement.displayable_identiques %}
+                        {% if not amendement.displayable_identiques_are_similaires and identiques %}
+                            <span title="{% if identiques|length > 1 -%}
+                                Les amendements identiques {% for amdt in identiques -%}
+                                {{ amdt }}{% if loop.revindex == 2 %} et {% else %}{% if not loop.last %}, {% endif %}{% endif %}
+                                {%- endfor %} n’ont pas des réponses similaires
+                            {%- else -%}
+                                L’amendement identique {{ identiques[0] }} n’a pas une réponse similaire
+                            {%- endif %}">⚠️</span>
+                        {% endif %}
+                    {% endif %}
+                </td>
+                <td>
+                    <a class="arrow-right"
+                        href="{{ request.resource_url(context[amendement.num_str], 'amendement_edit') }}"
+                        data-action="amendements-backlinks#update">
+                        Voir
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% if not all_amendements %}
+        <div class="notice">
+            <h3>Les amendements ne sont pas encore disponibles.</h3>
+            <p>S’ils ne sont pas encore publiés sur le site Internet de l’Assemblée nationale / du Sénat, tout va bien, veuillez patienter.</p>
+            <p>S’ils sont publiés sur le site, c’est un indicateur qu’ils arrivent bientôt sur Signale ! En effet, il est possible que les amendements soient publiés sur le site Internet (ou sur l’intranet parlementaire notamment ELOI) mais qu’ils ne soient pas encore disponibles pour Signale, en particulier lorsqu’il s’agit d’une lecture Assemblée nationale.</p>
+            <p>Si cela vous semble anormalement long, veuillez <a href="{{ request.route_url('aide') }}">consulter la page d’aide dédiée</a> et/ou <a href="mailto:{{ request.registry.settings.get('zam.contact_mail') }}">contacter l’équipe de développement</a> pour solliciter de l’aide.</p>
+        </div>
+    {% endif %}
+    <div data-controller="amendements-articles">
+        <nav id="bottom-nav">
+            <a class="toggle primary button" href="#"
+                data-action="amendements-articles#toggle">
+                Liste des articles&nbsp;&nbsp;&nbsp;↓
+            </a>
+        </nav>
+        <section id="articles" class="d-none"
+            data-target="amendements-articles.list">
+            <ul>
+                {% for article in articles | sort %}
+                    {# On ne liste pas les inconnus ni les intersticiels ni les erreurs ici #}
+                    {% if article.type and not article.pos and not article.type == "erreur" %}
+                        <li>
+                            <a class="underlined" href="{{ request.resource_url(context.parent['articles'][article.url_key]) }}">
+                                {{ article.format() }}
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ request.static_url('zam_repondeur:static/js/amendements.js') }}"></script>
+    {% if all_amendements %}
+        <script>;(() => application.register('amendements-filters', AmendementsFilters))()</script>
+    {% endif %}
+    <script src="{{ request.static_url('zam_repondeur:static/js/progress.js') }}"></script>
+{% endblock %}

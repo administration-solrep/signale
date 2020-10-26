@@ -1,0 +1,439 @@
+{% extends "_base_lecture.html" %}
+{% import "macros.html" as macros %}
+
+{% block header %}
+<style type="text/css">
+    h1 {
+        margin-bottom: 2rem;
+    }
+    .box {
+        margin: 1rem 0;
+        padding: 1rem;
+        position: relative;
+    }
+        main.box {
+            z-index: 0;
+        }
+        .box.amendement-card {
+            box-shadow: none;
+        }
+    .options {
+        margin-left: 3.5rem;
+        margin-right: 3.5rem;
+    }
+    .table {
+        margin-left: 3.5rem;
+        margin-right: 3.5rem;
+        width: calc(100% - 7rem);
+    }
+    .amendement-checkbox {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        transform: scale(1.5);
+    }
+
+    .notice {
+        margin: 3rem;
+    }
+        .notice h3 {
+            margin: 1rem 0 2rem 0;
+        }
+        .notice nav {
+            padding: 0 1rem;
+            text-align: right;
+        }
+            .notice nav a {
+                font-size: 1.4rem;
+                padding-right: 2rem;
+                background-image: url("{{ request.static_url('zam_repondeur:static/img/big_right.svg') }}");
+                background-position: center;
+                background-repeat: no-repeat;
+                background-position: right 33%;
+                background-size: 0.9rem;
+            }
+    .amendement-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: stretch;
+    }
+        .amendement-card p {
+            margin: 1rem 2rem 1rem 0;
+        }
+        .amendement-card-infos {
+            flex-basis: 40rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+            .amendement-card-infos .article {
+                font-style: italic;
+            }
+                .amendement-card-infos a.article {
+                    text-decoration: underline;
+                }
+            .amendement-card-infos .numero {
+                font-weight: 600;
+            }
+            .amendement-card-infos .auteur {
+                font-style: italic;
+            }
+        .amendement-card-avis {
+            flex-basis: 18rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            white-space: nowrap;
+        }
+            .amendement-card-avis p {
+                margin: 1rem 1rem 0 0;
+                text-align: center;
+            }
+
+            .amendement-card-avis .button {
+                margin: 0.5rem auto;
+            }
+            .amendement-card-avis .icon.favorable {
+                color: #83d524;
+            }
+            .amendement-card-avis .icon.sagesse {
+                color: #6db4ff;
+            }
+            .amendement-card-avis .icon.defavorable {
+                color: #d0021b;
+            }
+            .amendement-card-avis .avis {
+                text-align: center;
+            }
+            .amendement-card-avis .avis p {
+                color: inherit;
+                font-weight: 600;
+            }
+    .amendement-batch {
+        position: relative;
+    }
+        .amendement-batch,
+        .amendement-batch:before,
+        .amendement-batch:after,
+        .amendement-card {
+            background-color: #fff;
+            border: 1px solid #ccc;
+        }
+        .amendement-batch:before,
+        .amendement-batch:after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-transform: rotateZ(0.5deg);
+            -o-transform: rotate(0.5deg);
+            transform: rotateZ(0.5deg);
+            z-index: -1;
+            left: 11px;
+            top: 11px;
+        }
+        .amendement-batch:after {
+            -webkit-transform: rotateZ(0.25deg);
+            -o-transform: rotate(0.25deg);
+            transform: rotateZ(0.25deg);
+            left: 6px;
+            top: 6px;
+        }
+    .highlighted {
+        background: #d4edda;
+    }
+        .highlighted.amendement-batch,
+        .highlighted.amendement-batch:before,
+        .highlighted.amendement-batch:after,
+        .highlighted.amendement-card {
+            background-color: #d4edda;
+        }
+    .button {
+        min-width: 10rem;
+        text-align: center;
+    }
+    .warning {
+        cursor: pointer;
+        margin-left: -.7rem;
+    }
+    .sticky {
+        box-shadow: none;
+    }
+    .table thead th {
+        border: none;
+    }
+    .table tbody tr td {
+        border: none;
+        padding: 0;
+    }
+    label {
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+    .filters {
+        text-align: center;
+    }
+        .table .filters th {
+            vertical-align: baseline;
+        }
+</style>
+{% endblock %}
+
+{% macro avis(amendement) %}
+    {% if not amendement.gouvernemental %}
+        {% if is_owner %}
+            {% if amendement.user_content.avis %}
+                <p>
+                    {{ avis_icon(amendement) }}
+                    {{ amendement.user_content.avis }}
+                </p>
+            {% endif %}
+        {% else %}
+            {{ amendement.user_content.avis or "Aucun" }}
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+{% macro avis_icon(amendement) %}
+    {% if amendement.user_content.favorable %}
+        {% set icon_class = "favorable" %}
+    {% elif amendement.user_content.sagesse %}
+        {% set icon_class = "sagesse" %}
+    {% else %}
+        {% set icon_class = "defavorable" %}
+    {% endif %}
+    {{ macros.svg_icon("edit", icon_class) }}
+{% endmacro %}
+
+{% macro edit_button(amendement) %}
+    {% if is_owner %}
+        {% set edit_url = request.resource_url(
+            context.lecture_resource['amendements'][amendement.num_str], 'amendement_edit'
+        ) %}
+        {% if amendement.user_content.avis %}
+            <a class="primary button" href="{{ edit_url }}">Traiter</a>
+        {% else %}
+            <a class="primary button enabled" href="{{ edit_url }}">Traiter</a>
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+{% block body %}
+    <svg aria-hidden="true" style="position: absolute; width: 0; height: 0;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <defs>
+            <symbol id="person" viewBox="0 0 13 14">
+                <path d="M6.5 6.588c1.796 0 3.25-1.474 3.25-3.294S8.296 0 6.5 0 3.25 1.474 3.25 3.294 4.704 6.588 6.5 6.588zm0 1.647c-2.17 0-6.5 1.288-6.5 3.843V14h13v-1.922c0-2.555-4.33-3.843-6.5-3.843z"/>
+            </symbol>
+            <symbol id="identique" viewBox="0 0 19 22">
+                <path d="M14,0 L2,0 C0.9,0 0,0.9 0,2 L0,16 L2,16 L2,2 L14,2 L14,0 Z M17,4 L6,4 C4.9,4 4,4.9 4,6 L4,20 C4,21.1 4.9,22 6,22 L17,22 C18.1,22 19,21.1 19,20 L19,6 C19,4.9 18.1,4 17,4 Z M17,20 L6,20 L6,6 L17,6 L17,20 Z" id="Shape" fill="#000000"></path>
+            </symbol>
+            <symbol id="edit" viewBox="0 0 22 22">
+                <path d="M2.67 18.045l.644 3.658 3.658-.645 8.884-12.689-4.302-3.012L2.67 18.045zM18.637 4.87a1.088 1.088 0 0 0-.268-1.518l-2.962-2.074a1.088 1.088 0 0 0-1.517.268L12.27 3.862l4.747 3.324 1.622-2.316z"/>
+            </symbol>
+        </defs>
+    </svg>
+    <h1 data-controller="table-anchor">Mon espace de travail</h1>
+    {% set count = all_amendements|length %}
+    <div class="content"
+        data-controller="amendements-filters"
+        data-amendements-filters-initial-count="{{ count }}">
+        {% if count %}
+            <div class="options">
+                <a class="toggle" href="#"
+                    data-action="amendements-filters#toggle"
+                    data-target="amendements-filters.link">
+                    Filtrer
+                </a>
+                <span data-target="amendements-filters.count">{{ count }} amendements</span>
+            </div>
+        {% endif %}
+
+        <table class="table"
+            data-controller="amendements-selection"
+            data-target="amendements-filters.table">
+            <thead class="sticky">
+                <tr class="groupActions d-none"
+                    data-controller="amendements-backlinks">
+                    <th>
+                        Actions groupées :
+                    </th>
+                    <th>
+                        <a id="transfer-amendements"
+                            href="{{ request.resource_url(context.lecture_resource, 'transfer_amendements') }}"
+                            class="button primary"
+                            data-action="amendements-backlinks#update">
+                            Transférer
+                        </a>
+                    </th>
+                    <th>
+                        <a id="export-pdf" href="{{ request.resource_url(context.lecture_resource, 'export_pdf') }}" class="button primary">Exporter en PDF</a>
+                    </th>
+                    <th>
+                        <a id="batch-amendements" href="{{ request.resource_url(context.lecture_resource, 'batch_amendements') }}" class="button primary">Créer un lot</a>
+                    </th>
+                </tr>
+                <tr class="filters d-none"
+                    data-target="amendements-filters.row amendements-selection.filters">
+                    <th>
+                        <label for="article">Article </label>
+                        <input id="article" type="text" class="form-control form-control-sm"
+                            autocomplete="off" autocorrect="off"
+                            data-action="keyup->amendements-filters#filterArticle"
+                            data-target="amendements-filters.articleInput">
+                    </th>
+                    <th>
+                        <label for="numero">Nº </label>
+                        <input id="numero" type="text" class="form-control form-control-sm"
+                            autocomplete="off" autocorrect="off"
+                            data-action="keyup->amendements-filters#filterAmendement"
+                            data-target="amendements-filters.amendementInput">
+                        <input type="checkbox" id="gouvernemental"
+                            data-action="amendements-filters#filterGouvernemental"
+                            data-target="amendements-filters.gouvernementalCheckbox">
+                        <label for="gouvernemental"
+                            data-target="amendements-filters.gouvernementalLabel">
+                            <abbr class="status blue" title="Afficher seulement les amendements gouvernementaux">Gouv.</abbr>
+                        </label>
+                    </th>
+                    <th>
+                        {# Required to match group actions number of rows. #}
+                    </th>
+                    <th>
+                        <input id="select-all" type="checkbox" name="select-all"
+                            data-action="amendements-selection#selectAll">
+                        <label for="select-all">Tous</label>
+                    </th>
+                </tr>
+                <tr class="shadow-bottom d-none"
+                    data-target="amendements-selection.bottom amendements-filters.bottom">
+                    <th colspan="4"></th>
+                </tr>
+            </thead>
+            <tbody data-controller="amendements-backlinks" data-target="amendements-filters.tbody">
+                {% set highlighted_amdt = request.session.pop('highlighted_amdt', None) %}
+                {% for amendement in collapsed_amendements %}
+                    <tr id="{{ amendement.slug }}"
+                        data-article="
+                           {%- if amendement.is_abandoned_before_seance -%}
+                               {{ amendement.VERY_BIG_NUMBER }}
+                           {%- elif amendement.article.type == 'article' -%}
+                               {{ amendement.article.num }} {{ amendement.article.mult }}
+                           {%- else -%}
+                               {{ amendement.article.type }}
+                           {%- endif -%}
+                       "
+                       data-mission="{{ amendement.mission_titre or '' }}"
+                       data-order="{{ loop.index }}"
+                       data-amendement="
+                           {%- if amendement.location.batch -%}
+                               {{ amendement.location.batch.nums|join(',') }}
+                           {%- else -%}
+                               {{ amendement.num }}
+                           {%- endif -%}
+                        "
+                        data-gouvernemental="{{ 1 if amendement.gouvernemental else 0 }}">
+                        <td colspan="4">
+                            <div class="box amendement-card
+                                {% if amendement.slug == highlighted_amdt %}highlighted{% endif %}
+                                {% if amendement.location.batch %}amendement-batch{% endif %}
+                                ">
+                                <div class="amendement-card-infos">
+                                    <div class="entete">
+                                        {% if amendement.article.is_erreur %}
+                                            <span class="article">⚠️ Erreur de récupération de l’article</span>
+                                        {% elif amendement.article.pos %}
+                                            <span class="article">{{ amendement.article.format() }}</span>
+                                        {% else %}
+                                            <a href="{{ request.resource_url(context.lecture_resource['articles'][amendement.article.url_key]) }}" class="article" target="_blank">{{ amendement.article.format() }}</a>
+                                        {% endif %}
+                                        {% if amendement.mission_titre %}
+                                            - {{ amendement.mission_titre }}
+                                        {% endif %}
+                                        –
+
+                                        {# Numéro(s) #}
+                                        {% if amendement.location.batch %}
+                                            N<sup>os</sup>&nbsp;<span class="numero">{{ amendement.location.batch.nums|enumeration }}</span>
+                                        {% else %}
+                                            Nº&nbsp;<span class="numero">{{ amendement }}</span>
+                                        {% endif %}
+
+                                        {% if amendement.identique %}
+                                            {{ macros.svg_icon("identique") }}
+                                            {% set identiques = amendement.displayable_identiques %}
+                                            {% if not amendement.displayable_identiques_are_similaires and identiques %}
+                                                <span class="warning" title="{% if identiques|length > 1 -%}
+                                                    Les amendements identiques {% for amdt in identiques -%}
+                                                    {{ amdt }}{% if loop.revindex == 2 %} et {% else %}{% if not loop.last %}, {% endif %}{% endif %}
+                                                    {%- endfor %} n’ont pas des réponses similaires
+                                                {%- else -%}
+                                                    L’amendement identique {{ identiques[0] }} n’a pas une réponse similaire
+                                                {%- endif %}">⚠️</span>
+                                            {% endif %}
+                                        {% endif %}
+                                        {{ macros.status(amendement) }}
+                                    </div>
+                                    <div class="objet">
+                                        {{ amendement.user_content.objet | paragriphy }}
+                                    </div>
+                                    <div class="auteur">
+                                        {{ macros.svg_icon("person") }}
+                                        {% if amendement.gouvernemental %}
+                                            Le gouvernement
+                                        {% else %}
+                                            {% if amendement.location.batch %}
+                                                {{ amendement.location.batch.groupes | join(', ') }}
+                                            {% else %}
+                                                {% if amendement.groupe %}
+                                                    {{ amendement.groupe }} ({{ amendement.auteur }})
+                                                {% else %}
+                                                    {{ amendement.auteur }}
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="amendement-card-avis">
+                                    <div class="amendement-checkbox">
+                                        <input type="checkbox" name="amendement-selected" value="{{ amendement.num }}">
+                                    </div>
+                                    <div class="avis">
+                                        {{ avis(amendement) }}
+                                        {{ edit_button(amendement) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <div class="notice">
+                        {% if is_owner %}
+                            <h3>Il n’y a rien sur l'espace de travail !</h3>
+                            <nav>
+                                <a href="{{ index_url }}">Retourner au dérouleur</a>
+                            </nav>
+                        {% else %}
+                            <p>Il n’y a aucun amendement sur cet espace de travail pour l’instant.</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block notifications_extras %}
+    data-notifications-with-diff-check-url="{{ check_url }}"
+    data-notifications-with-diff-check-interval="{{ request.registry.settings['zam.check_for.transfers_from_to_my_table'] }}"
+    data-notifications-with-diff-current="{{ table.amendements_as_string }}"
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ request.static_url('zam_repondeur:static/js/table.js') }}"></script>
+    <script src="{{ request.static_url('zam_repondeur:static/js/amendements.js') }}"></script>
+    {% if all_amendements %}
+        <script>;(() => application.register('amendements-filters', AmendementsFilters))()</script>
+    {% endif %}
+    <script>;(() => application.register('notifications-with-diff', NotificationsWithDiff))()</script>
+{% endblock %}

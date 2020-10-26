@@ -1,0 +1,110 @@
+{% extends "_base.html" %}
+
+
+{% block header %}
+    <style type="text/css">
+        /* Two-columns layout */
+        main {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+        }
+        main > section {
+            flex-basis: 90ch;
+            margin: 2rem;
+            max-width: calc(90ch - 2rem);
+        }
+        main > section.content {
+            margin-right: 1rem;
+        }
+        main > section.edit {
+            margin-left: 1rem;
+            padding: 2rem;
+        }
+        main > section > div {
+            margin-bottom: 2rem;
+        }
+
+        h4 {
+            margin-bottom: 0.75rem;
+        }
+        .form-group {
+            margin-bottom: 3rem;
+        }
+        label {
+            font-weight: 600;
+            margin: 2rem 0 1rem 0;
+            font-size: 1.2rem;
+        }
+        textarea {
+            height: 30vh;
+        }
+        div.mce-fullscreen {
+            z-index: 1030;
+        }
+        .title {
+            margin-top: 2.5rem;
+        }
+        .title header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .title header h2 {
+            font-weight: 600;
+        }
+        .title header h3 {
+            font-size: 1.4rem;
+            font-weight: 400;
+        }
+        .title header h4 {
+            font-size: 1.2rem;
+            font-weight: 400;
+        }
+        .last-update {
+            text-align: left;
+        }
+        .journal {
+            text-align: right;
+        }
+        .journal .arrow-right {
+            background: no-repeat right 30%/7% url("{{ request.static_url('zam_repondeur:static/img/big_right.svg') }}");
+        }
+
+        dl dd {
+            overflow: auto !important;
+        }
+    </style>
+{% endblock %}
+
+{% block main_class %}{% endblock %}
+
+{% block scripts %}
+    <script src="{{ request.static_url('zam_repondeur:static/js/unsaved.js') }}"></script>
+    <script src="{{ request.static_url('zam_repondeur:static/tinymce-5-3-2/tinymce.min.js') }}"></script>
+    <script type="text/javascript">
+        tinymce.init({
+            selector: 'textarea.editable',
+            language: 'fr_FR',
+            menubar: false,
+            plugins: 'lists fullscreen paste table',
+            toolbar:
+                'undo redo | formatselect | bold italic removeformat | bullist numlist | table | cut copy paste | fullscreen',
+            branding: false,
+            elementpath: false,
+            content_style: 'p, li { line-height: 1.5; margin: 1em 0; }',
+            block_formats: 'Paragraphe=p;Titre=h3',
+            browser_spellcheck: true,
+            init_instance_callback: function(editor) {
+                editor.on('Dirty', event => {
+                    const form = document.getElementById('edit-amendement')
+                    const controller = application.getControllerForElementAndIdentifier(
+                        form,
+                        'unsaved-changes'
+                    )
+                    controller.setDirty()
+                })
+            }
+        })
+    </script>
+    {% block extra_scripts %}{% endblock %}
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "auth/_base_auth.html" %}
+
+{% block body %}
+<h1>Entrer dans Signale</h1>
+<form method="POST" class="intro">
+    <fieldset>
+        {% if request.session.pop('missing_email', None) %}
+            <p class="error">La saisie d’une adresse de courriel est requise.</p>
+        {% endif %}
+        {% if request.session.pop('incorrect_email', None) %}
+            <p class="error">La saisie d’une adresse de courriel valide est requise.</p>
+        {% endif %}
+        {% if request.session.pop('incorrect_domain', None) %}
+            <p class="error">Cette adresse de courriel n’est pas acceptée.</p>
+        {% endif %}
+        {% if request.session.pop('already_in_use', None) %}
+            <p class="error">Cette adresse de courriel est déjà utilisée<br>dans une autre équipe.</p>
+        {% endif %}
+        <input type="hidden" name="csrf_token" value="{{ get_csrf_token() }}">
+        <label for="email">Votre courriel professionnel (en .gouv.fr)</label>
+        <input type="email" name="email" autocomplete="email"
+            required
+            autocorrect="off" spellcheck="false">
+    </fieldset>
+    <input type="submit" class="button primary enabled" value="Entrer dans Signale">
+</form>
+{% endblock %}

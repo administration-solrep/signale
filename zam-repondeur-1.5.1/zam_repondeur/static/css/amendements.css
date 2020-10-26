@@ -1,0 +1,180 @@
+h2.subtitle {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 1.5rem;
+}
+p.subtitle {
+    font-style: italic;
+    font-size: 1.1rem;
+    text-align: center;
+    font-weight: normal;
+    margin-bottom: 1.5rem;
+}
+
+.content {
+    margin: 0 1rem;
+}
+    .content .notice {
+        margin-top: 2rem;
+    }
+
+/* Articles */
+#bottom-nav {
+    margin-top: 5rem;
+    margin-bottom: 3rem;
+}
+#articles ul {
+    column-width: 12rem;
+     margin-bottom: 3rem;
+}
+#articles li {
+    margin-bottom: 0.75rem;
+}
+
+
+/* Table formatting */
+.table {
+    background: white;
+    max-width: 55rem;
+    margin: 0 auto;
+}
+.table th, .table td {
+    vertical-align: middle;
+    padding: .45rem .75rem .4rem;
+}
+.table td > span,
+.table td a {
+    display: inline-block;
+    line-height: 1;
+}
+.table thead th {
+    border: none;
+    font-weight: 600;
+    white-space: nowrap;
+    padding: .75rem;
+}
+.table tbody tr:first-child td {
+    padding-top: 1rem;
+}
+.table tr:hover {
+    background: #d4edda66;
+}
+
+/* Filtering */
+tr[data-retire-avant-seance="1"] {
+    background-color: #d9d9d9;
+}
+
+td.identique {
+    position: relative;
+}
+td.identique:after {
+    content: "";
+    background-color: lightblue;
+    position: absolute;
+    width: 6px;
+    top: 0;
+    right: 0;
+    height: calc(100% + 1px);  /* extra pixel to cover tr bottom border */
+}
+td.identique.first:after {
+    bottom: -1px;  /* move down 1 pixel to cover tr bottom border */
+    top: inherit;
+    height: calc(100% - 4px);
+    border-radius: 6px 6px 0 0;
+}
+td.identique.last:after {
+    height: calc(100% - 5px);
+    border-radius: 0 0 6px 6px;
+}
+td.identique.first.last:after {
+    top: 5px;
+    height: calc(100% - 10px);
+    border-radius: 6px;
+}
+table.filtered-amendement td.identique:after,
+table.filtered-amendement td.identique.first.last:after,
+table.filtered-emptytable td.identique:after,
+table.filtered-emptytable td.identique.first.last:after,
+table.filtered-status td.identique:after,
+table.filtered-status td.identique.first.last:after {
+    top: calc(50% - 3px);
+    height: 6px;
+    border-radius: 6px;
+}
+
+/* Links in table */
+td a, td a:hover {
+    white-space: nowrap;
+    text-decoration: none;
+}
+td a.arrow-right {
+    padding-right: .8rem;
+    background: no-repeat right 35%/18% url("../img/big_right.svg");
+}
+
+:target {
+    background: #ededed66;
+}
+/* To keep under :target for priority. */
+.highlighted {
+    background: #d4edda66;
+}
+nobr {
+    display: block;
+}
+span.avis {
+    width: 6px;
+    display: block;
+    height: 1.5rem;
+    float: left;
+    margin: 0 0.5rem 0 0;
+}
+span.avis.positive {
+    background-color: #b8e986;
+}
+span.avis.sagesse {
+    background-color: #6db4ff;
+}
+span.avis.negative {
+    background-color: #d0021b;
+}
+span.avis.gouvernement {
+    background-color: #3167a6;
+}
+span.avis.abandoned_before_seance {
+    background-color: #979797;
+}
+
+td form {
+    display: inline-block;
+}
+tr.limit-derouleur {
+    text-align: center;
+    background-color: #ffc107;
+    font-style: italic;
+}
+
+.button-sm {
+    font-size: .9rem;
+    min-width: 1rem;
+    padding: 0.4rem 1rem 0.2rem 1rem;
+}
+.button-sm.enabled:hover {
+    font-size: .9rem;
+    min-width: 1rem;
+    padding: 0.4rem 1rem 0.2rem 1rem;
+}
+#amendement-help.box.notice {
+    visibility: visible;
+    opacity: 1;
+    transition: visibility 0s, opacity 0.5s linear, height 0.5s linear;
+    margin-top: 1rem;
+    margin-bottom: 0;
+}
+#amendement-help.box.notice.v-hidden {
+    visibility: hidden;
+    opacity: 0;
+    height: 0;
+}

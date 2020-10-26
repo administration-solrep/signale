@@ -1,0 +1,71 @@
+.title-extras {
+    text-align: center;
+}
+.timeline > ul {
+    list-style-type: none;
+}
+    .timeline > ul > li {
+        display: flex;
+    }
+.timeline h3 {
+    margin-left: 10rem;
+    margin-top: 4rem;
+}
+.timeline p {
+    margin-bottom: 0;
+}
+.timeline table {
+  width: 100%;
+  border-collapse: collapse;
+}
+  .timeline table td {
+    padding: .4rem .6rem;
+    border: 1px solid #565656;
+  }
+    .timeline table td p {
+      margin: 0;
+    }
+
+.timeline .icon {
+    width: inherit;
+    height: inherit;
+    border-left: 3px solid #3167a6;
+    margin: 0 1rem;
+}
+    .timeline .icon i {
+        display: inline-block;
+        width: 2.8rem;
+        height: 2.8rem;
+        margin: .6rem 0 0 -1.5rem;
+        background: white no-repeat center center;
+        border: 2px solid #3167a6;
+        border-radius: 50%;
+    }
+    .timeline .icon .icon-edit {
+        background-image: url("../img/journal/edit.svg");
+    }
+    .timeline .icon .icon-boite {
+        background-image: url("../img/journal/boite.svg");
+    }
+    .timeline .icon .icon-document {
+        background-image: url("../img/journal/document.svg");
+    }
+.when, .what {
+    padding: 1.5rem 1rem;
+    min-width: 10rem;
+}
+.when {
+    text-align: right;
+    padding-right: 3rem;
+}
+.when time {
+    text-decoration: underline dotted;
+}
+details {
+}
+    details summary abbr[title] {
+        cursor: pointer;
+    }
+    details[open] summary {
+        margin-bottom: .5rem;
+    }

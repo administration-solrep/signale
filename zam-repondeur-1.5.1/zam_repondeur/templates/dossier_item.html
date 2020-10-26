@@ -1,0 +1,136 @@
+{% extends "_base_dossier.html" %}
+{% import "macros.html" as macros %}
+
+{% block header %}
+<style type="text/css">
+    main {
+        max-width: 60rem;
+        margin: 2rem auto;
+    }
+
+    .lecture {
+        margin: 2rem 0.5rem;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+    }
+    .lecture:first-child {
+        margin-top: 2rem;
+    }
+    .lecture nav {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        flex-direction: column;
+        text-align: right;
+        min-width: 250px;
+    }
+    .lecture nav a {
+        background: no-repeat right center url("{{ request.static_url('zam_repondeur:static/img/big_right.svg') }}");
+    }
+    .lecture nav a {
+        font-size: 1.1rem;
+        padding-right: 1.8rem;
+        background-position: 99% 42%;
+        background-size: 5%;
+    }
+    .lecture nav a:first-child {
+        font-size: 1.7rem;
+        padding-right: 2rem;
+        background-position: right 40%;
+        background-size: 7%;
+    }
+    .lecture .details {
+        line-height: 1.2;
+    }
+    .lecture.box.notice {
+        visibility: visible;
+        opacity: 1;
+        transition: visibility 0s, opacity 0.5s linear, height 0.5s linear;
+        margin-top: 1rem;
+    }
+    .lecture.box.notice.v-hidden {
+        visibility: hidden;
+        opacity: 0;
+        height: 0;
+    }
+    .extra-button {
+        margin-top: 1rem;
+        justify-content: center;
+    }
+        .extra-button a.button {
+            color: #3167a6;
+            border: 1px solid #3167a6;
+        }
+        .extra-button a.button:hover {
+            background-color: #3167a6;
+            color: white;
+        }
+</style>
+{% endblock %}
+
+{% block main_class %}box{% endblock %}
+
+{% block body %}
+    <h1>{{ dossier.titre }}</h1>
+
+    <div data-controller="dossier-help">
+        <div class="last-update">
+            Dernière mise à jour :
+            <time datetime="{{ dossier.last_event_datetime.isoformat(timespec='milliseconds') }}"
+                data-controller="timestamp"
+                data-timestamp-modified-at="{{ dossier.last_event_timestamp }}">
+                    {{ dossier.last_event_datetime | human_readable_time }}
+            </time>
+            <br>
+            <a class="underlined" href="{{ request.resource_url(context, 'journal') }}">
+                Journal
+            </a>
+            • <a href="#dossier-help" data-action="dossier-help#toggle">Un problème ?</a>
+        </div>
+
+        <div class="lecture box notice" id="dossier-help" data-target="dossier-help.content">
+            <div>
+                <a class="close-help" data-action="dossier-help#toggle" href="">×</a>
+                <h3>Votre lecture n’apparait pas ?</h3>
+                <p>Veuillez vous assurer qu’elle est présente sur le site de l’Assemblée Nationale ou du Sénat sur la page du dossier législatif.</p>
+                <p>Si cela vous semble anormalement long, veuillez <a href="{{ request.route_url('aide') }}">consulter la page d’aide dédiée</a> et/ou <a href="mailto:{{ request.registry.settings.get('zam.contact_mail') }}">contacter l’équipe de développement</a> pour solliciter de l’aide.</p>
+            </div>
+        </div>
+    </div>
+
+    {% for lecture in lectures|reverse %}
+        <div class="lecture box">
+            <div>
+                <h3>{{ lecture.chambre.value }}, {{ lecture.format_organe() }}</h3>
+                <p>{{ lecture.format_num_lecture() }}, {{ lecture.format_texte() }}</p>
+                {% if lecture.nb_amendements %}
+                    <em>{{ lecture.nb_amendements }} amendements</em>
+                {% endif %}
+            </div>
+            <nav>
+                <a href="{{ request.resource_url(context['lectures'][lecture.url_key], 'tables', request.user.email) }}">
+                    Mon espace de travail
+                </a>
+                <a href="{{ request.resource_url(context['lectures'][lecture.url_key], 'amendements') }}">
+                    Dérouleur
+                </a>
+            </nav>
+        </div>
+    {% endfor %}
+
+    {% if allowed_to_delete %}
+        <div class="extra-button lecture box">
+            <form method="post" action="{{ request.resource_url(context) }}" id="delete-dossier" data-controller="dossier-item">
+                <div role="group">
+                    <input type="submit" data-action="dossier-item#delete" class="danger allow-multiple-submit button" value="Supprimer le dossier">
+                </div>
+            </form>
+        </div>
+    {% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ request.static_url('zam_repondeur:static/js/dossiers.js') }}"></script>
+{% endblock %}

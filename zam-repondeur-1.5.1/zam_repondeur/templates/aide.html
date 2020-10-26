@@ -1,0 +1,70 @@
+{% extends "_base.html" %}
+
+{% block header %}
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/selectize/css/selectize.css') }}">
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/selectize/css/selectize.bootstrap3.css') }}">
+    <style type="text/css">
+        h2 {
+            text-align: center;
+            margin: 2.5rem 0 1.5rem 0;
+            font-weight: 600;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+
+<h2>Résolution de problèmes</h2>
+
+<h3>La lecture n'apparaît pas dans le dossier législatif</h3>
+<ol>
+  <li>La lecture ne peut apparaître sur SIGNALE que si elle existe sur les sites Internet parlementaires. Assurez-vous qu'elle est présente sur le site de l'Assemblée Nationale ou du Sénat, sur la page du dossier législatif. Par exemple pour le PLF :</li>
+  <ul>
+    <li><a target="_blank" href="http://www.assemblee-nationale.fr/dyn/15/dossiers/loi_finances_2020">http://www.assemblee-nationale.fr/dyn/15/dossiers/loi_finances_2020</a></li>
+    <li><a target="_blank" href="http://www.senat.fr/dossier-legislatif/pjlf2020.html">http://www.senat.fr/dossier-legislatif/pjlf2020.html</a></li>
+  </ul>
+  <li>Veuillez contacter l'équipe technique si le problème persiste.</li>
+</ol>
+
+<h3>Les amendements n'apparaissent pas (ou pas tous) dans une lecture Assemblée Nationale</h3>
+
+<p>Rappel : les amendements ne peuvent arriver sur SIGNALE que lorsque le délai de dépôt est expiré et que les services de l'Assemblée sont intervenus, ce qui signifie que les amendements peuvent être visibles sur ELOI avant d'être publiés et donc avant de pouvoir être récupérés par SIGNALE.</p>
+
+<ol>
+  <li>Vérifiez la présence des amendements sur la page du dossier législatif du site de l'Assemblée Nationale</li>
+  <li>Vérifiez leur présence dans l'API (= le canal par lequel SIGNALE aspire les amendements de l'Assemblée), par exemple pour la lecture Séance publique du texte n°2243 : 
+    <ul>
+      <li><a target="_blank" href="http://www.assemblee-nationale.fr/eloi/15/amendements/2243/AN/liste.xml">http://www.assemblee-nationale.fr/eloi/15/amendements/2243/AN/liste.xml</a></li>
+    </ul> (si ce fichier ne contient qu'une ligne, vérifier l'attribut nbrAmdtRestant qui peut donner un indice sur les amendements restants à traiter par les services de l'Assemblée Nationale)</li>
+  <li>Vérifiez que le numéro du texte sur SIGNALE est correct (et par exemple pour une lecture séance publique, que le numéro sur SIGNALE correspond bien au texte de la commission et non au texte initial), et nous contacter si ça n'est pas le cas</li>
+  <li>Si tout semble cohérent, lancez un rafraîchissement manuel car le rafraîchissement automatique s'effectue toutes les heures et vous êtes peut-être entre deux opérations automatiques ; attention : l'utilisation du bouton de rafraîchissement manuel doit rester raisonnée pour ne pas saturer le système, lorsque vous cliquez, l'opération se lance et peut prendre quelques minutes (en fonction du volume d'amendements)</li>
+  <li>Veuillez contacter l'équipe technique si le problème persiste.</li>
+</ol>
+
+<h3>Certains boutons de validation ou de filtre n'apparaissent pas</h3>
+
+<ol>
+  <li>Vérifiez quel est votre navigateur Internet : si Internet Explorer est le navigateur par défaut, le clic de confirmation d'adresse courriel redirige automatiquement vers ce navigateur, même si initialement, vous aviez renseigné l'adresse courriel dans Mozilla Firefox par exemple</li>
+  <li>Si possible, configurez Mozilla Firefox comme votre navigateur par défaut ; si non, soyez vigilant à ce point car SIGNALE n'est pas supporté par Internet Explorer</li>
+  <li>Vérifiez que votre navigateur Internet est à jour ; si vous êtes tous sur Mozilla Firefox mais que seuls certains de vos collègues parviennent à utiliser correctement SIGNALE, c'est peut-être que votre version de navigateur est obsolète (tentez de redémarrer votre ordinateur)</li>
+  <li>Veuillez contacter l'équipe technique si le problème persiste.</li>
+</ol>
+
+<h3>Le dossier législatif n'apparaît pas alors qu'il vous a été confirmé que vous avez été invité-e à participer à ce dossier</h3>
+
+<ol>
+  <li>Vérifiez que l'adresse courriel invitée est bien celle avec laquelle vous tentez de vous connectez ; si par exemple sur Outlook vous jonglez indifféremment avec 2 adresses, il s'agit bien de 2 adresses distinctes et si l'une des 2 a été renseignée dans SIGNALE pour lancer l'invitation alors il ne sera pas possible de retrouver le dossier législatif en se connectant avec l'autre</li>
+  <li>Veuillez contacter l'équipe technique si le problème persiste.</li>
+</ol>
+
+<h3>Vous ne parvenez pas à vous connecter à partir du lien d'authentification envoyé automatiquement par SIGNALE sur votre adresse courriel</h3>
+
+<ol>
+  <li>Vérifiez que le lien est encore actif : pour des raisons de sécurité, le lien de confirmation expire au bout de 10 minutes ; si les 10 minutes se sont écoulées depuis la réception de ce courriel, il suffit de retourner sur SIGNALE pour renseigner à nouveau votre adresse courriel et recevoir un nouveau lien d'authentification</li>
+  <li>Vérifiez que le lien est encore valable : pour des raisons de sécurité, le lien de confirmation est unique ; le lien présent dans un courriel de confirmation reçu "anciennement" (c'est-à-dire lors d'une connexion précédente) n'est plus utilisable</li>
+  <li>Veuillez contacter l'équipe technique si le problème persiste.</li>
+</ol>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

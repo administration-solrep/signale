@@ -1,0 +1,175 @@
+{%- macro article_page(article) -%}
+  <section class="page article">
+    <header>
+      <h2>{{ article.format(short=False) }}</h2>
+      {% if article.user_content.title %}
+        <div class="title">{{ article.user_content.title }}</div>
+      {% endif %}
+    </header>
+    {% if article.content %}
+      <div>
+        {% for number, content in article.content.items() %}
+          <dl>
+            <dt>{{ number }}</dt>
+            <dd>
+              <p>{{ content.strip('"') | safe }}</p>
+            </dd>
+          </dl>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </section>
+  {% if article.user_content.presentation %}
+    <section class="page presentation">
+      <h4>Présentation de l’article</h4>
+      <h5>{{ article.format(short=True) }}</h5>
+      <h5>{{ article.user_content.title }}</h5>
+      <div>
+        {{ article.user_content.presentation | h3_to_h5 | safe }}
+      </div>
+    </section>
+  {% endif %}
+{%- endmacro %}
+
+
+{%- macro response_page(amendements) -%}
+  {% set multiple = amendements|length > 1 %}
+  {% set amendement = amendements[0] %}
+  {% if amendement.user_content.avis or amendement.user_content.objet or amendement.user_content.has_reponse %}
+    <section class="page reponse">
+      <header>
+        <h3>Réponse</h3>
+      </header>
+      <table class="cartouche">
+        <tr>
+          <td>Article</td>
+          <td>{{ amendement.article.format(short=True) }}</td>
+        </tr>
+        {% if amendement.parent %}
+          <tr>
+            <td>Amendement</td>
+            <td>{{ amendement.parent.num_disp }}</td>
+          </tr>
+          <tr>
+            <td>Sous-amendement{% if multiple %}s{% endif %}</td>
+            <td>
+              {% for amendement in amendements %}
+                {{ amendement.num_disp }}{% if loop.revindex == 2 %} et {% else %}{% if not loop.last %}, {% endif %}{% endif %}
+              {% endfor %}
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td>Amendement{% if multiple %}s{% endif %}</td>
+            <td>
+              {% for amendement in amendements -%}
+                {{ amendement.num_disp }}{% if loop.revindex == 2 %} et {% else %}{% if not loop.last %}, {% endif %}{% endif %}
+              {%- endfor %}
+            </td>
+          </tr>
+        {% endif %}
+        <tr>
+          <td>Auteur{% if multiple %}s{% endif %}</td>
+          <td>
+            {% if amendement.gouvernemental %}
+              Gouvernement
+            {% else %}
+              {% for auteur, _ in amendements|groupby('auteur') -%}
+                {% if loop.previtem is defined and auteur != loop.previtem or loop.previtem is not defined -%}
+                  {{ auteur }}{% if loop.revindex == 2 and loop.nextitem != auteur %} et {% else %}{% if not loop.last %}, {% endif %}{% endif %}
+                {%- endif %}
+              {%- endfor %}
+            {% endif %}
+          </td>
+        </tr>
+        {% if not amendement.gouvernemental %}
+          <tr>
+            <td>Groupe{% if multiple %}s{% endif %}</td>
+            <td>
+              {% for groupe, _ in amendements|groupby('groupe') -%}
+                {% if loop.previtem is defined and groupe != loop.previtem or loop.previtem is not defined -%}
+                  {{ groupe }}{% if loop.revindex == 2 %} et {% else %}{% if not loop.last %}, {% endif %}{% endif %}
+                {%- endif %}
+              {%- endfor %}
+            </td>
+          </tr>
+          <tr>
+            <td>Avis</td>
+            <td>{{ amendement.user_content.avis }}</td>
+          </tr>
+        {% endif %}
+      </table>
+      <div>
+        {% if amendement.user_content.has_objet %}
+          <h5>Objet</h5>
+          {{ amendement.user_content.objet | h3_to_h5 | paragriphy }}
+        {% endif %}
+        {% if amendement.user_content.has_reponse %}
+          <h5>Réponse</h5>
+          {{ amendement.user_content.reponse | h3_to_h5 | paragriphy }}
+        {% endif %}
+      </div>
+    </section>
+  {% endif %}
+{%- endmacro %}
+
+{%- macro amendement_page(amendement) -%}
+  <section class="page amendement">
+    <header>
+      {% if amendement.parent %}
+        <h3>Sous-amendement nº {{ amendement.num_disp }}</h3>
+      {% else %}
+        <h3>Amendement nº {{ amendement.num_disp }}</h3>
+      {% endif %}
+    </header>
+    <table class="cartouche">
+      <tr>
+        <td>Article</td>
+        <td>{{ amendement.article.format(short=True) }}</td>
+      </tr>
+      {% if amendement.parent %}
+        <tr>
+          <td>Amendement</td>
+          <td>{{ amendement.parent.num_disp }}</td>
+        </tr>
+        <tr>
+          <td>Sous-amendement</td>
+          <td>{{ amendement.num_disp }}</td>
+        </tr>
+      {% else %}
+        <tr>
+          <td>Amendement</td>
+          <td>{{ amendement.num_disp }}</td>
+        </tr>
+      {% endif %}
+      {% if amendement.gouvernemental %}
+        <tr>
+          <td>Auteur</td>
+          <td>Gouvernement</td>
+        </tr>
+      {% else %}
+        <tr>
+          <td>Auteur</td>
+          <td>{{ amendement.auteur }}</td>
+        </tr>
+        <tr>
+          <td>Groupe</td>
+          <td>{{ amendement.groupe }}</td>
+        </tr>
+      {% endif %}
+      {% if amendement.sort %}
+        <tr>
+          <td>Sort</td>
+          <td>{{ amendement.sort }}</td>
+        </tr>
+      {% endif %}
+    </table>
+    <div>
+      <h4>Exposé</h4>
+      {{ amendement.expose|h3_to_h5|safe }}
+
+      <h4>Corps de l’amendement</h4>
+      {{ amendement.corps|h3_to_h5|safe }}
+    </div>
+  </section>
+{%- endmacro %}

@@ -1,0 +1,229 @@
+{% extends "visionneuse/_base.html" %}
+
+{% block title %}
+  <section id="{{ article.slug }}">
+    <header>
+      <div class="wrapper">
+        <div class="titles">
+          <h2>{{ article.format(short=False) }}</h2>
+        </div>
+        {% if article.content or article.user_content.presentation %}
+          <a href="#content-{{ article.slug }}"
+             class="button"
+             data-toggle-target="content-{{ article.slug }}"
+            >Texte</a>
+        {% endif %}
+      </div>
+    </header>
+  </section>
+{% endblock %}
+
+{% block secondary_nav %}
+  <nav class="secondary">
+    {% if previous_article %}
+      <a class="arrow-left" href="{{ request.resource_url(context.parent, previous_article.url_key, 'reponses') }}">{{ previous_article.format() }}</a>
+    {% else %}
+      <span></span>  {# placeholder so that the "next" link gets positioned properly #}
+    {% endif %}
+    {% if next_article %}
+      <a class="arrow-right" href="{{ request.resource_url(context.parent, next_article.url_key, 'reponses') }}">{{ next_article.format() }}</a>
+    {% endif %}
+  </nav>
+  <div class="is-none">
+    <span class="fake-anchor" id="content-{{ article.slug }}"></span>
+    <div class="article">
+      <h2 class="article-title">{{ article.user_content.title or "" }}</h2>
+      {% if article.user_content.presentation %}
+        <h3>Présentation de l’article</h3>
+        {{ article.user_content.presentation | safe }}
+      {% endif %}
+      {% if article.content %}
+        <h3>Texte de l’article</h3>
+        {% for number, content in article.content.items() %}
+          <dl>
+            <dt>{{ number }}</dt>
+            <dd>
+              <p>{{ content.strip('"') | safe }}</p>
+            </dd>
+          </dl>
+        {% endfor %}
+      {% endif %}
+      <p class="bottom">
+        <a class="button arrow arrow-up" href="#{{ article.slug }}">Replier</a>
+      </p>
+    </div>
+  </div>
+{% endblock %}
+
+{% block main %}
+  <section>
+    {% for reponse, amendements in grouped_displayable_amendements %}
+      {% set amendement = amendements[0] %}
+      {% set is_gouvernemental = amendement.gouvernemental %}
+      {% set parent = amendement.parent %}
+      <article class="{% if is_gouvernemental %}gouvernemental{% endif %} {% if parent %}sous-amendement{% endif %}">
+        {% for amdt in amendements %}
+          <span class="fake-anchor" id="{{ amdt.slug }}"></span>
+        {% endfor %}
+        {% if amendement.user_content.favorable %}
+          {% set avis_class = 'positive' %}
+        {% elif amendement.user_content.sagesse %}
+          {% set avis_class = 'sagesse' %}
+        {% elif is_gouvernemental %}
+          {% set avis_class = 'gouvernemental' %}
+        {% else %}
+          {% set avis_class = 'negative' %}
+        {% endif %}
+        {% set multiple = amendements|length > 1 %}
+        <header class="reponse {{ avis_class }}">
+          <div
+          {%- for amendement in amendements %}
+            data-amendement-{{ amendement.num }}="{{ amendement }}"
+          {% endfor -%}
+          data-anchor="{{ amendement.slug }}"
+          >
+            <a href="#{{ amendement.slug }}"
+               class="button"
+               data-toggle-target="amendement-detail-{{ amendement.num }}">
+              Texte
+            </a>
+            <h2>
+              {{ multiple_amendements_title(amendements) }}
+            </h2>
+            {% if amendement.user_content.objet and (amendement.user_content.objet|length < 200) %}
+              <div class="presentation">
+                {{ amendement.user_content.objet | paragriphy }}
+              </div>
+            {% endif %}
+            {% if is_gouvernemental %}
+              <p class="authors"><span class="author">Gouvernement</span></p>
+            {% else %}
+              <p class="authors">
+                {% for groupe, amdts_groupe in amendements|groupby('groupe') -%}
+                  {%- for auteur, _ in amdts_groupe|groupby('auteur') -%}
+                    <span class="author">
+                      {{ auteur }}{% if loop.revindex == 2 %} et {%- else -%}{% if not loop.last %}, {% endif %}{%- endif -%}
+                    </span>
+                  {%- endfor -%}
+                  {% if groupe %} ({{ groupe }} {% if amdts_groupe[0].couleur_groupe != "#ffffff" -%}
+                      <span class="group-color" style="background-color: {{ amdts_groupe[0].couleur_groupe }};"></span>
+                    {%- endif %})
+                  {%- endif %}{% if not loop.last %}, {% endif %}
+                {%- endfor %}
+              </p>
+            {% endif %}
+          </div>
+          {% if is_gouvernemental %}
+            <div class="gouvernemental">
+              <a href="#{{ amendement.slug }}"
+                 class="button gouvernemental"
+                 data-toggle-target="reponse-detail-{{ amendement.num }}">
+                Présentation
+              </a>
+            </div>
+          {% else %}
+            <hr>
+            <div>
+              <a href="#{{ amendement.slug }}"
+                 class="button"
+                 data-toggle-target="reponse-detail-{{ amendement.num }}">
+                Réponse
+              </a>
+              <p>Avis : <span class="avis {{ avis_class }}">{{ amendement.user_content.avis }}</span></p>
+            </div>
+          {% endif %}
+        </header>
+        <div class="is-none">
+          <div id="reponse-detail-{{ amendement.num }}" class="reponse-detail {{ avis_class }}{% if is_gouvernemental %} gouvernemental{% endif %}">
+            {% if amendement.user_content.has_objet %}
+              <h4>Objet</h4>
+              <div>
+                {{ amendement.user_content.objet | paragriphy }}
+              </div>
+            {% endif %}
+            {% if amendement.user_content.has_reponse %}
+              {% if is_gouvernemental %}
+                <h4>Présentation</h4>
+              {% else %}
+                <h4>Réponse</h4>
+              {% endif %}
+              <div>
+                {{ amendement.user_content.reponse | paragriphy }}
+              </div>
+            {% endif %}
+            <p class="bottom">
+              <a class="button arrow arrow-up" href="#{{ amendement.slug }}">
+                Replier
+              </a>
+            </p>
+          </div>
+        </div>
+        <div class="is-none">
+          <div id="amendement-detail-{{ amendement.num }}"
+               class="amendement-detail {{ avis_class }}">
+            {% for amendement in amendements %}
+              {% if multiple %}
+                <h3>
+                  Amendement {{ amendement.num }}
+                  — {{ amendement.auteur }}
+                  {% if amendement.groupe -%}
+                    <small>({{ amendement.groupe }}
+                      <span class="group-color" style="background-color: {{ amendement.couleur_groupe }};"></span>)</small>
+                  {%- endif %}
+                </h3>
+              {% endif %}
+              <div>
+                <h4>Exposé</h4>
+                {{ amendement.expose|safe }}
+                <h4>Corps de l’amendement</h4>
+                {{ amendement.corps|safe }}
+              </div>
+            {% endfor %}
+            <p class="bottom">
+              <a class="button arrow arrow-up" href="#{{ amendement.slug }}">
+                Replier
+              </a>
+            </p>
+          </div>
+        </div>
+      </article>
+    {% endfor %}
+  </section>
+{% endblock %}
+
+{% block bottom_nav %}
+  {% if grouped_displayable_amendements %}
+    <nav class="bottom secondary">
+      {% if previous_article %}
+        <a class="arrow-left" href="{{ request.resource_url(context.parent, previous_article.url_key, 'reponses') }}">{{ previous_article.format() }}</a>
+      {% else %}
+        <span></span>  {# placeholder so that the "next" link gets positioned properly #}
+      {% endif %}
+      {% if next_article %}
+        <a class="arrow-right" href="{{ request.resource_url(context.parent, next_article.url_key, 'reponses') }}">{{ next_article.format() }}</a>
+      {% endif %}
+    </nav>
+  {% endif %}
+{% endblock %}
+
+{% macro multiple_amendements_title(amendements) %}
+    {% set amendement = amendements[0] %}
+    {% set parent = amendement.parent %}
+    {% set length = amendements|length %}
+    Amendement{% if length > 1 %}s{% endif %} {% if length > 5 %}
+        {{ amendements[0] }},
+        {{ amendements[1] }},
+        …,
+        {{ amendements[-3] }},
+        {{ amendements[-2] }} et
+        {{ amendements[-1] }}
+        ({{ length }} au total)
+    {% else %}
+        {% for amendement in amendements %}
+            {{ amendement }}{% if loop.revindex == 2 %} et {% else %}{% if not loop.last %}, {% endif %}{% endif %}
+        {% endfor %}
+    {% endif %}
+    {% if parent %} (sous-amendement au {{ parent }}){% endif %}
+{% endmacro %}
+
+</html>

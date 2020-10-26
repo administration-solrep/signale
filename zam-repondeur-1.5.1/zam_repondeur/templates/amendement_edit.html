@@ -1,0 +1,412 @@
+{% extends "_base_edit.html" %}
+{% import "macros.html" as macros %}
+
+{% block title %}
+    {{ amendement.lecture }} • {{ amendement.lecture.dossier.titre }} • Signale
+{% endblock %}
+
+{% block header %}
+    {{ super() }}
+    <style type="text/css">
+        /* Link to article */
+        h5 a {
+            text-decoration: underline;
+        }
+
+        .button.secondary {
+            border-color: #3167a6;
+            color: #3167a6;
+            background: white;
+        }
+            .button.secondary:hover {
+                border-color: #3167a6;
+                color: white;
+                background: #3167a6;
+            }
+
+        #edit-amendement .save-buttons {
+            background: white;
+            padding: 1rem;
+            flex-wrap: wrap;
+        }
+            #edit-amendement .save-buttons input[name="save-and-transfer"] {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+        .notice {
+            margin-top: 2rem;
+        }
+        .expose .line-through {
+            margin-top: 3rem;
+        }
+        .article {
+            font-style: italic;
+        }
+            .article a {
+                text-decoration: underline;
+            }
+        .auteur {
+            background: no-repeat left 20%/2.4% url("{{ request.static_url('zam_repondeur:static/img/personne.svg') }}");
+            padding-left: 1.4rem;
+        }
+        .identiques {
+            background: no-repeat left 20%/2.4% url("{{ request.static_url('zam_repondeur:static/img/identique.svg') }}");
+            padding-left: 1.4rem;
+        }
+        form#transfer a {
+            margin-right: 3rem;
+        }
+        .corps table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 3rem;
+        }
+          .corps table td,
+          .corps table th {
+            padding: .6rem 1rem;
+            border: 1px solid #565656;
+          }
+        .corps table.credits caption {
+            caption-side: top;
+            text-align: right;
+            padding-bottom: 0;
+        }
+        .corps table.credits th {
+            text-align: center;
+        }
+            .corps table.credits th:first-child {
+                text-align: left;
+            }
+        .corps table.credits td {
+            text-align: right;
+        }
+            .corps table.credits td:first-child {
+                text-align: left;
+            }
+        .corps table.credits tr:last-child {
+            font-weight: bold;
+        }
+            .corps table.credits tr:last-child td:last-child {
+                text-align: center;
+            }
+        {% if amendement.location.batch %}
+            .box,
+            .box.edit {
+                padding: 0;
+            }
+            .box > *:not(.batch) {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+            .box .notice {
+                margin-left: 2rem;
+                margin-right: 2rem;
+            }
+            .batch {
+                text-align: center;
+                background: #d6eaff;
+                margin: 0 0 3rem 0;
+                padding: .5rem 1rem;
+                min-height: 2.8rem;
+            }
+            .batch p {
+                margin-bottom: 0;
+                padding-top: .3rem;
+            }
+            .batch .button {
+                border-color: white;
+                color: white;
+                font-size: .9rem;
+                padding: 0.3rem 1.5rem 0.1rem 1.5rem;
+            }
+            .batch .button:hover {
+                border-color: white;
+                color: #3167a6;
+                background: white;
+            }
+            .content .batch {
+                background: #3167a6;
+                color: white;
+                margin-bottom: 1rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: baseline;
+            }
+            .content .batch a {
+                color: white;
+                padding: 0 1rem;
+            }
+            .content .batch .current {
+                margin: 0 1rem;
+                border-bottom: 3px solid white;
+            }
+        {% endif %}
+    </style>
+{% endblock %}
+
+{% block body %}
+    <section class="content box">
+        {% if amendement.location.batch %}
+            <div class="batch">
+                <p>
+                    Afficher le n°
+                    {% for amdt in amendement.location.batch.amendements %}
+                        {% if amdt.num == amendement.num %}
+                            <span class="current">{{ amendement.num }}</span>
+                        {% else %}
+                            <a href="{{ request.resource_url(context.parent, amdt.num_str, 'amendement_edit') }}">{{ amdt.num }}</a>
+                        {% endif %}
+                    {% endfor %}
+                </p>
+                {% if is_on_my_table %}
+                <form method="post" action="{{ request.resource_url(context.lecture_resource, 'batch_amendements') }}">
+                    <input type="hidden" name="nums" value="{{ amendement.num }}">
+                    <input type="submit" class="button" value="Retirer du lot">
+                </form>
+                {% endif %}
+            </div>
+        {% endif %}
+        <p>
+            <a href="{{ back_url }}" class="arrow-left">Retour</a>
+        </p>
+        <div class="title">
+            <header>
+                <h2>Amendement nº&nbsp;{{ amendement }}</h2>
+
+                {% if amendement.parent %}
+                    <h3>Sous-amendement au <a href="{{ request.resource_url(context.lecture_resource['amendements'][amendement.parent.num_str], 'amendement_edit') }}">{{ amendement.parent }}</a></h3>
+                {% endif %}
+
+                {{ macros.status(amendement) }}
+
+            </header>
+
+            {% if amendement.article.is_erreur %}
+                <p class="article notice warning">
+                    La récupération de l’article correspondant à cet amendement n’a pas pu être effectuée correctement. L’équipe de développement de Signale a été prévenue de cette anomalie critique.
+                </p>
+            {% else %}
+                <p class="article">
+                    {% if amendement.article.pos %}
+                        {{ amendement.article.format() }}
+                    {% else %}
+                        <a href="{{ request.resource_url(context.lecture_resource['articles'][amendement.article.url_key]) }}" target="_blank">{{ amendement.article.format() }}</a>
+                    {% endif %}
+                </p>
+            {% endif %}
+            {% if amendement.mission_titre %}
+                <p>
+                    {{ amendement.mission_titre }}
+                </p>
+            {% endif %}
+            {% if amendement.auteur %}
+            <div class="auteur">
+                <p>
+                    Présenté par {{ amendement.auteur }}
+                    {%- if not amendement.gouvernemental %}
+                        ({{ amendement.groupe }})
+                    {% endif %}
+                </p>
+            </div>
+            {% endif %}
+            <div class="identiques">
+                {% set identiques = amendement.all_identiques %}
+                {% if identiques %}
+                    {% set identiques_length = identiques|length %}
+                    <p>
+                        <em>
+                            Identique au{% if identiques_length > 1 %}x{% endif %} nº
+                            {% for identique in identiques -%}
+                                <a href="{{ request.resource_url(context.parent[identique.num_str], 'amendement_edit') }}">{{ identique }}</a>
+                                {% if not identique.reponse_similaire(amendement) %}
+                                    <span title="Cet amendement identique n’a pas une réponse similaire">⚠️</span>
+                                {% endif %}
+                                {% if loop.revindex == 2 and identiques_length > 1 %} et {% else %}{% if not loop.last %}, {% endif %}{% endif %}
+                            {%- endfor %}
+                        </em>
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+        <p class="journal">
+            <a href="{{ request.resource_url(context, 'journal') }}" class="arrow-right">Journal des modifications</a>
+        </p>
+        {{ content(amendement) }}
+    </section>
+    <section class="edit box">
+        {% if is_on_my_table %}
+            {{ form(amendement) }}
+        {% else %}
+            <div class="notice {% if amendement.location.user_table %}{% if amendement.is_being_edited %}danger{% else %}warning{% endif %}{% endif %}">
+                <p>
+                    Pour pouvoir éditer cet amendement, il doit se trouver sur votre espace de travail.
+                </p>
+                {% if amendement.location.user_table %}
+                    {% set amendement_user = amendement.location.user_table.user %}
+                    {% if amendement.is_being_edited %}
+                        <p>
+                            Cet amendement est <strong>en cours d’édition par
+                            {{ macros.user_activity(amendement_user) }}
+                            </strong>.
+                            Si vous transférez cet amendement, <strong>ses modifications ne seront pas enregistrées</strong>.
+                        </p>
+                        <form id="transfer" action="{{ my_table_url }}" method="POST">
+                            <input type="hidden" name="nums" value="{{ amendement.num }}">
+                            <a href="{{ transfer_url }}" class="button danger">Transférer à…</a>
+                            <input type="submit" name="submit-table" class="button enabled danger" value="Forcer le transfert sur mon espace de travail">
+                        </form>
+                    {% else %}
+                        <p>
+                            Cet amendement <strong>est déjà sur l'espace de travail de
+                            {{ macros.user_activity(amendement_user) }}
+                            </strong>.
+                        </p>
+                        <form id="transfer" action="{{ my_table_url }}" method="POST">
+                            <input type="hidden" name="nums" value="{{ amendement.num }}">
+                            <a href="{{ transfer_url }}" class="button warning">Transférer à…</a>
+                            <input type="submit" name="submit-table" class="button enabled warning" value="Transférer sur mon espace de travail">
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <form id="transfer" action="{{ my_table_url }}" method="POST">
+                        <input type="hidden" name="nums" value="{{ amendement.num }}">
+                        <a href="{{ transfer_url }}" class="button primary">Transférer à…</a>
+                        <input type="submit" name="submit-table" class="button primary enabled" value="Transférer sur mon espace de travail">
+                    </form>
+                {% endif %}
+            </div>
+            {{ reponse(amendement) }}
+        {% endif %}
+    </section>
+{% endblock %}
+
+
+{% macro content(amendement) %}
+    <div class="expose">
+        <h4 class="line-through">Exposé</h4>
+        {% if amendement.expose %}
+            {{ amendement.expose | safe }}
+        {% else %}
+            <i>Néant</i>
+        {% endif %}
+    </div>
+    <div class="corps">
+        <h4 class="line-through">Corps de l’amendement</h4>
+        {{ amendement.corps | safe }}
+    </div>
+{% endmacro %}
+
+
+{% macro reponse(amendement) %}
+    <div class="reponse">
+        {% if amendement.user_content.avis %}
+            <h4 class="line-through">Position du gouvernement</h4>
+            <p>{{ amendement.user_content.avis or '' }}</p>
+        {% endif %}
+        {% if amendement.user_content.objet %}
+            <h4 class="line-through">Objet de l’amendement</h4>
+            {{ amendement.user_content.objet | paragriphy }}
+        {% endif %}
+        {% if amendement.user_content.reponse %}
+            <h4 class="line-through">
+                {% if not amendement.gouvernemental %}
+                    Réponse à l’amendement
+                {% else %}
+                    Présentation de l’amendement
+                {% endif %}
+            </h4>
+            {{ amendement.user_content.reponse | paragriphy }}
+        {% endif %}
+        {% if amendement.user_content.comments %}
+            <h4 class="line-through">Commentaires</h4>
+            {{ amendement.user_content.comments | paragriphy }}
+        {% endif %}
+    </div>
+{% endmacro %}
+
+
+{% macro form(amendement) %}
+
+    {% if amendement.location.batch %}
+        <div class="batch">
+            <p>La réponse saisie ci-dessous est commune à tous les amendements du lot.</p>
+        </div>
+    {% endif %}
+
+    <h3>
+        {% if not amendement.gouvernemental %}
+            Répondre
+        {% else %}
+            Présentation
+        {% endif %}
+    </h3>
+
+    <form id="edit-amendement"
+          action="{{ submit_url }}"
+          method="POST"
+          data-controller="unsaved-changes"
+          data-action="beforeunload@window->unsaved-changes#beforeUnload unload@window->unsaved-changes#unload"
+          data-unsaved-changes-dirty="false"
+          data-unsaved-changes-start-editing-url="{{ request.resource_url(context, 'start_editing') }}"
+          data-unsaved-changes-stop-editing-url="{{ request.resource_url(context, 'stop_editing') }}"
+          class="mt-3">
+
+        {% if not amendement.gouvernemental %}
+        <div class="form-group">
+            <label for="avis">Position du gouvernement</label>
+            <select name="avis" class="form-control" data-action="unsaved-changes#setDirty">
+                <option value="">Choisir dans la liste…</option>
+                {% for value in avis %}
+                    <option value="{{ value }}" {%- if amendement.user_content.avis == value %} selected{% endif %}>{{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% else %}
+        <input type="hidden" name="avis" value="{{ amendement.user_content.avis or '' }}">
+        {% endif %}
+
+        <div class="form-group">
+            <label for="objet">Objet de l’amendement</label>
+            <textarea name="objet" class="form-control editable" style="height: 100px;">{{ amendement.user_content.objet or "" | safe }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="reponse">
+                {% if not amendement.gouvernemental %}
+                    Réponse à l’amendement
+                {% else %}
+                    Présentation de l’amendement
+                {% endif %}
+            </label>
+            <textarea name="reponse" class="form-control editable" style="height: 600px;">{{ amendement.user_content.reponse or "" | safe }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="comments">Commentaires <small>(n’apparaissent pas dans le dossier de banc)</small></label>
+            <textarea name="comments" class="form-control" data-action="keydown->unsaved-changes#setDirty">{{ amendement.user_content.comments or "" | safe }}</textarea>
+        </div>
+
+        <div class="form-group save-buttons">
+            <input type="submit" name="save-and-transfer" value="Enregistrer et transférer" class="button enabled primary" data-action="unsaved-changes#allowFormSubmission">
+            <a href="{{ back_url }}" class="arrow-left">Retour</a>
+            <input type="submit" name="save" value="Enregistrer" class="button primary" data-action="unsaved-changes#allowFormSubmission">
+        </div>
+
+    </form>
+{% endmacro %}
+
+{% block notifications_extras %}
+    {% if is_on_my_table %}
+        data-notifications-with-diff-unique-table-url="{{ my_table_url }}"
+        data-notifications-with-diff-unique-check-url="{{ check_url }}"
+        data-notifications-with-diff-unique-check-interval="{{ request.registry.settings['zam.check_for.amendement_stolen_while_editing'] }}"
+        data-notifications-with-diff-unique-amendement-num="{{ amendement.num }}"
+        data-notifications-with-diff-unique-current="{{ table.amendements_as_string }}"
+    {% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+    {% if is_on_my_table %}
+        <script>;(() => application.register('notifications-with-diff-unique', NotificationsWithDiffUnique))()</script>
+    {% endif %}
+{% endblock %}
