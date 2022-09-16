@@ -1,0 +1,110 @@
+{% extends "_base_dossier.html" %}
+{% import "macros.html" as macros %}
+
+{% block header %}
+    <link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/dossier.css') }}">
+    <style type="text/css">
+        .lecture nav a {
+            background: no-repeat right center url("{{ request.static_url('zam_repondeur:static/img/big_right.svg') }}");
+        }
+    </style>
+{% endblock %}
+
+{% block main_class %}box dossier-main relative{% endblock %}
+
+{% block body %}
+    {{ macros.msg_readonly(dossier.team.active, 0) }}
+
+    <h1>{{ dossier.titre }}</h1>
+
+    {% if dossier.team.active and dossier.alert_flag and request.user.is_admin %}
+        {{ macros.alert_maj(dossier.pk, True, True, request, context, context) }}
+    {% endif %}
+
+    <div data-controller="dossier-help">
+        <div class="last-update">
+            Dernière mise à jour :
+            <time datetime="{{ dossier.last_event_datetime.isoformat(timespec='milliseconds') }}"
+                data-controller="timestamp"
+                data-timestamp-modified-at="{{ dossier.last_event_timestamp }}">
+                    {{ dossier.last_event_datetime | human_readable_time }}
+            </time>
+            <br>
+            <a class="underlined" href="{{ request.resource_url(context, 'journal') }}">
+                Journal
+            </a>
+            • <a href="#dossier-help" data-action="dossier-help#toggle">Un problème ?</a>
+        </div>
+
+        <div class="lecture box notice v-hidden" id="dossier-help" data-target="dossier-help.content">
+            <div>
+                <a class="close-help" data-action="dossier-help#toggle" href="">×</a>
+                <h3>Votre lecture n’apparait pas ?</h3>
+                <p>Veuillez vous assurer qu’elle est présente sur le site de l’Assemblée Nationale ou du Sénat sur la page du dossier législatif.</p>
+                <p>Si cela vous semble anormalement long, veuillez <a href="{{ request.route_url('aide') }}">consulter la page d’aide dédiée</a> et/ou <a href="mailto:{{ request.registry.settings.get('zam.contact_mail') }}">contacter le support technique</a> pour solliciter de l’aide.</p>
+                <p>Vous pouvez également consulter le <a href="{{ request.route_url('manuel_utilisateur', _query={'back':request.path}) }}" title="Télécharger le manuel d'utilisation">manuel d'utilisation</a>.</p>
+            </div>
+        </div>
+    </div>
+
+    {% if dossier.titre_loi and dossier.url_loi_promulgation %}
+    <div class="centered">
+        <div class="bloc">Loi promulguée : <a href="{{ dossier.url_loi_promulgation }}" target="_blank"> Loi {{ dossier.titre_loi }}</a></div>
+    </div>
+    {% endif %}
+
+    <div class="extra-button lecture">
+        <a class="button primary" href="{{ contact_mailto }}">
+            Contacter les coordinateurs ministériels
+        </a>
+    </div>
+
+    {% for lecture in lectures|reverse %}
+        <div class="lecture box">
+            <div>
+                <h3>{{ lecture.chambre.value }}, {{ lecture.format_organe() }}</h3>
+                <p>{{ lecture.format_num_lecture() }}, {{ lecture.format_texte() }}</p>
+                {% if lecture.nb_amendements %}
+                    <em>{{ lecture.nb_amendements }} amendements</em>
+                {% endif %}
+            </div>
+            {% if request.user.is_admin and dossier.team.active %}
+                <form method="post"
+                      action="{{ request.resource_url(context, 'change_lecture_update_status') }}"
+                      class="maj-form">
+                    <input type="hidden" name="pk" value="{{ lecture.pk }}">
+                    <button type="submit" name="maj"
+                            class="maj-button {% if not lecture.update %}disabled{% endif %}">
+                        <svg viewBox="0 0 16 16" class="bi bi-arrow-repeat" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
+                          <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
+                        </svg>
+                        {% if lecture.update %}Désactiver{% else %}Activer{% endif %} les mises à jour du dérouleur
+                    </button>
+                </form>
+            {% endif %}
+            {% if dossier.team.active and lecture.alert_flag and request.user.is_admin %}
+                {{ macros.alert_maj(lecture.pk, False, False, request, context, context) }}
+            {% endif %}
+            <nav>
+                <a href="{{ request.resource_url(context['lectures'][lecture.url_key], 'tables', request.user.email) }}">
+                    Mon espace de travail
+                </a>
+                <a href="{{ request.resource_url(context['lectures'][lecture.url_key], 'amendements') }}">
+                    Dérouleur
+                </a>
+            </nav>
+        </div>
+    {% endfor %}
+
+    {% if allowed_to_delete %}
+        <div class="extra-button lecture box">
+            <a href="{{ request.resource_url(context, 'gestion') }}" class="primary button">Gestion du dossier</a>
+        </div>
+    {% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ request.static_url('zam_repondeur:static/js/dossiers.js') }}"></script>
+{% endblock %}

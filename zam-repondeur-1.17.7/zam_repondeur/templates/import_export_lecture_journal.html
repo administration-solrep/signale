@@ -1,0 +1,18 @@
+{% extends "_base_lecture.html" %}
+{% import "macros.html" as macros with context %}
+
+{% block header %}
+    <link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/journal.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/lecture.css') }}">
+{% endblock %}
+
+{% block body %}
+    {{ macros.msg_readonly(lecture.dossier.team.active, 0) }}
+
+    <a href="{{ request.resource_url(context) }}" class="arrow-left">
+        Retour à la page d'export {{ "/ import" if lecture.dossier.team.active else "de données" }}
+    </a>
+
+    <h2>Journal</h2>
+    {{ macros.timeline(events, today) }}
+{% endblock %}

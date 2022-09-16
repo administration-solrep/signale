@@ -1,0 +1,53 @@
+.progressbar {
+    width: 100%;
+    background-color: #ddd;
+    height: .75rem;
+}
+.progressbar .success {
+    height: 100%;
+    background-color: #3167a6;
+}
+.rounded {
+    border-radius: 1rem !important;
+}
+.dossierbanc .infos {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: space-between;
+}
+div.import-corbeille {
+    text-align: center;
+}
+
+p {
+    text-align: justify;
+}
+.box .box {
+    margin: 4rem auto;
+    max-width: 45rem;
+}
+.flex-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: normal;
+    margin: 1rem 1rem 4rem;
+}
+    .flex-line > div {
+        margin-right: 3rem;
+    }
+    .flex-line p {
+        margin-bottom: 0;
+    }
+    .flex-line .button {
+        min-width: 15rem;
+        text-align: center;
+        margin-top: 1rem;
+    }
+    .flex-line .button-sm {
+        font-size: .9rem;
+        min-width: 1rem;
+        padding: 0.4rem 1rem 0.2rem 1rem;
+    }
+.flex-line-sm {
+    margin: 1rem;
+}

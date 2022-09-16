@@ -1,0 +1,72 @@
+/* Two-columns layout */
+main {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+main > section {
+    flex-basis: 90ch;
+    margin: 2rem;
+    max-width: calc(90ch - 2rem);
+}
+main > section.content {
+    margin-right: 1rem;
+}
+main > section.edit {
+    margin-left: 1rem;
+    padding: 2rem;
+}
+main > section > div {
+    margin-bottom: 2rem;
+}
+
+h4 {
+    margin-bottom: 0.75rem;
+}
+.form-group {
+    margin-bottom: 3rem;
+}
+label {
+    font-weight: 600;
+    margin: 2rem 0 1rem 0;
+    font-size: 1.2rem;
+}
+textarea {
+    height: 30vh;
+}
+div.mce-fullscreen {
+    z-index: 1030;
+}
+.title {
+    margin-top: 2.5rem;
+}
+.title header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+.title header h2 {
+    font-weight: 600;
+}
+.title header h3 {
+    font-size: 1.4rem;
+    font-weight: 400;
+}
+.title header h4 {
+    font-size: 1.2rem;
+    font-weight: 400;
+}
+.last-update {
+    text-align: left;
+}
+.journal {
+    text-align: right;
+}
+dl {
+    text-align: justify;
+}
+dl dd {
+    overflow: auto !important;
+}
+section.edit div.readonly-message.marged {
+    margin: -2rem -2rem 2rem;
+}

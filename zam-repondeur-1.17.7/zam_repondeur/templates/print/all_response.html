@@ -1,0 +1,30 @@
+{# -----------------------------------
+  Headers used for the PDF outline:
+  - H1: dossier législatif
+  - H2: article
+  - H3: amendement
+ ----------------------------------- #}
+{% import 'print/macros.html' as macros %}
+<!doctype html>
+<html lang=fr>
+<head>
+  <meta charset=utf-8>
+</head>
+<body>
+    {{ macros.response_page(amendements) }}
+    <section class="amendements">
+      {% for amendement in amendements %}
+        {{ macros.amendement_page(amendement) }}
+      {% endfor %}
+    </section>
+    {% for amendement in amendements %}
+      {% for reponse, children_amendements in amendement.grouped_displayable_children() %}
+        {{ macros.response_page(children_amendements) }}
+        <section class="amendements">
+          {% for child in children_amendements %}
+            {{ macros.amendement_page(child) }}
+          {% endfor %}
+        </section>
+      {% endfor %}
+    {% endfor %}
+</body>

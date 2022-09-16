@@ -1,0 +1,109 @@
+#scrollUp {
+    display:none;
+}
+    #scrollUp a {
+        display: block;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+        #scrollUp a:hover {
+            text-decoration: none;
+            color: transparent;
+        }
+    #scrollUp,
+    #scrollUp a,
+    #scrollUp svg {
+        width:40px;
+        height: 40px;
+    }
+        #scrollUp svg path.arrow {
+            fill: #fff;
+        }
+        #scrollUp svg:hover {
+            border: 1px solid #3167A6;
+            border-radius: 20px;
+        }
+            #scrollUp svg:hover path.arrow {
+                fill: #3167A6;
+            }
+            #scrollUp svg:hover path.round {
+                fill: #fff;
+            }
+
+#positionneur_scrollUp {
+    position: fixed;
+    right: 50px;
+    bottom:50px;
+    z-index: 999;
+}
+
+main.banc #positionneur_scrollUp {
+    float: right;
+}
+main.banc #scrollUp {
+    position:fixed;
+    bottom:50px;
+    display:none;
+    right: 15px;
+}
+/* Comportement du bouton sur les pages normales */
+@media(min-width:1205px){
+    main.table-detail {
+        position: initial;
+        padding: 1.5rem 2rem;
+    }
+    main:not(.edit):not(.box-small):not(.box-large):not(.banc) #positionneur_scrollUp {
+        float: right;
+        position: inherit;
+    }
+    main:not(.edit):not(.box-small):not(.box-large):not(.banc) #scrollUp {
+        margin-left:50px;
+        position:fixed;
+        bottom:50px;
+        display:none;
+    }
+    main.relative:not(.edit):not(.box-small):not(.box-large):not(.banc) #scrollUp {
+        margin-left: 7rem !important;
+    }
+}
+/* Comportement du bouton sur les grandes pages (dérouleur) */
+@media(min-width:1410px){
+    main.box-large #positionneur_scrollUp {
+        float: right;
+        position: inherit;
+    }
+    main.box-large #scrollUp {
+        margin-left:50px;
+        position:fixed;
+        bottom:50px;
+        display:none;
+    }
+    main.box-large.relative #scrollUp {
+        margin-left: 6rem !important;
+    }
+}
+/* Comportement du bouton sur les doubles pages (éditions articles ou amendements) */
+@media(min-width:1650px){
+    main.edit #positionneur_scrollUp {
+        float: right;
+        position: inherit;
+    }
+    main.edit #scrollUp {
+        position:fixed;
+        bottom:50px;
+        display:none;
+    }
+}
+/* Comportement du bouton sur les petites pages (cf. Corbeilles) */
+@media(min-width:935px){
+    main.box-small #positionneur_scrollUp {
+        float: right;
+        position: inherit;
+    }
+    main.box-small #scrollUp {
+        margin-left:50px;
+        position:fixed;
+        bottom:50px;
+        display:none;
+    }
+}

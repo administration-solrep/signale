@@ -1,0 +1,19 @@
+{% extends "_base_dossier_liste.html" %}
+{% import "macros.html" as macros %}
+
+{% block boutons_dossiers %}
+    {% if request.user.is_admin and allowed_to_activate %}
+        <div class="extra-button dossier box">
+            <a class="button primary" href="{{ request.resource_url(context, 'add') }}">
+                Ajouter un dossier
+            </a>
+        </div>
+    {% else %}
+        <div class="box box_contacts">
+            <p>Si votre dossier législatif ne figure pas dans la liste, veuillez :</p>
+            <a class="button primary link" href="{{ request.resource_url(context, 'demande_invitation') }}">
+                Demander à participer à un dossier législatif
+            </a>
+        </div>
+    {% endif %}
+{% endblock %}

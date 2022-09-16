@@ -1,0 +1,67 @@
+[role="status"] {
+  position: fixed;
+  bottom: 1.5rem;
+  z-index: 10;
+  max-width: 45rem;
+  margin: 0 auto;
+  padding-top: 1rem;
+  left: 0;
+  right: 0;
+}
+  [role="status"] p {
+    margin: 1rem;
+    padding: 1rem 3rem;
+    text-align: center;
+    background: white;
+    font-size: 1.2rem;
+    border: 5px solid black;
+    box-shadow: 0 4px 6px 0 rgba(0,0,0,0.50);
+  }
+  [role="status"].notification-success p {
+    border-color: #62B600;
+  }
+  [role="status"].notification-danger p,
+  [role="status"].notification-error p,
+  [role="status"].notification-warning p {
+    border-color: #D0021B;
+  }
+  [role="status"] .button,
+  [role="status"] .button:hover {
+    margin-left: 2rem;
+    color: #3167a6;
+    background-color: white;
+    padding: .5rem 1rem .2rem 1rem;
+  }
+  [role="status"] .button.refresh,
+  [role="status"] .button.refresh:hover {
+    background: no-repeat .3rem url("../img/actualiser.svg");
+    padding-left: 2.9rem;
+  }
+  [role="status"] .success-notification {
+    background: no-repeat top left url("../img/validation.svg");
+    width: 32px;
+    height: 32px;
+    display: block;
+    float: left;
+  }
+  [role="status"] .danger-notification {
+    background: no-repeat top left url("../img/alerte.svg");
+    width: 32px;
+    height: 32px;
+    display: block;
+    float: left;
+  }
+  [role="status"] .close-notification {
+    text-align: center;
+    font-size: 2.5rem;
+    height: 2rem;
+    width: 2rem;
+    line-height: 1;
+    float: right;
+    background: white;
+    color: black;
+    border: 1px solid black;
+    border-radius: 2rem;
+    text-decoration: none;
+    overflow: hidden;
+  }

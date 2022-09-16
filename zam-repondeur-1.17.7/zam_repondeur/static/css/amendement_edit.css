@@ -1,0 +1,136 @@
+/* Link to article */
+h5 a {
+    text-decoration: underline;
+}
+
+.button.secondary {
+    border-color: #3167a6;
+    color: #3167a6;
+    background: white;
+}
+    .button.secondary:hover {
+        border-color: #3167a6;
+        color: white;
+        background: #3167a6;
+    }
+
+#edit-amendement .save-buttons {
+    background: white;
+    padding: 1rem;
+    flex-wrap: wrap;
+}
+    #edit-amendement .save-buttons input:not([name="save"]) {
+        width: 100%;
+        margin-bottom: 1rem;
+        white-space: normal;
+    }
+    #edit-amendement .save-buttons .alignment-buttons {
+        width: 100%;
+        flex-wrap: wrap-reverse;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    #edit-amendement .save-buttons .alignment-buttons input[name="save"].warning {
+        white-space: normal;
+        width: inherit;
+        min-width: 10rem;
+        margin-bottom: 1rem;
+    }
+.notice {
+    margin-top: 2rem;
+}
+.expose .line-through {
+    margin-top: 3rem;
+}
+.article {
+    font-style: italic;
+}
+    .article a {
+        text-decoration: underline;
+    }
+
+.auteur {
+    padding-left: 1.4rem;
+}
+.identiques {
+    padding-left: 1.4rem;
+}
+
+form#transfer a {
+    margin-right: 3rem;
+}
+.corps table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 3rem;
+}
+  .corps table td,
+  .corps table th {
+    padding: .6rem 1rem;
+    border: 1px solid #565656;
+  }
+.corps table.credits caption {
+    caption-side: top;
+    text-align: right;
+    padding-bottom: 0;
+}
+.corps table.credits th {
+    text-align: center;
+}
+    .corps table.credits th:first-child {
+        text-align: left;
+    }
+.corps table.credits td {
+    text-align: right;
+}
+    .corps table.credits td:first-child {
+        text-align: left;
+    }
+.corps table.credits tr:last-child {
+    font-weight: bold;
+}
+    .corps table.credits tr:last-child td:last-child {
+        text-align: center;
+    }
+.form-group textarea[name="objet"] {
+    height: 100px;
+}
+.form-group textarea[name="reponse"] {
+    height: 600px;
+}
+
+.bolded {
+    font-weight: 600;
+}
+img.warning-icon {
+   width: 20px;
+   cursor: pointer;
+   vertical-align: top;
+}
+
+.expose-content, .corps-content {
+    padding: .1rem;
+    overflow: auto !important;
+    text-align: justify;
+}
+
+/* Titre page amendement_edit avec navigation entre les amendements */
+div.title header .titre {
+    display: flex;
+    text-align: center !important;
+}
+div.title header .titre .arrow-left {
+    margin: 0 auto 0 0;
+    align-self: center;
+}
+div.title header .titre .arrow-right {
+    margin: 0 0 0 auto;
+    align-self: center;
+}
+div.title header h3 {
+    max-width: 100% !important;
+}
+div.title header .titre span.espace {
+    margin: auto;
+}

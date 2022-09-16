@@ -1,0 +1,487 @@
+/* Base */
+html {
+  /* Fallback based on http://markdotto.com/2018/02/07/github-system-fonts/ */
+  font-family: "source_sans_pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+               Helvetica, Arial, sans-serif,
+               "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  line-height: 1.5;
+  height: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: #f2f2f2;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+main {
+  margin-bottom: 4rem;
+}
+
+/* Headers */
+nav.main {
+  background-color: #3167a6;
+  padding: .7rem 0;
+  display: flex;
+  justify-content: space-between;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+  nav.main a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2rem;
+  }
+    nav.main a.list {
+      background: no-repeat left -.25rem/19% url("../img/hamburger.svg");
+      padding-left: 2.75rem;
+      margin-left: 3rem;
+    }
+    nav.main a.find {
+      background: no-repeat right top/13% url("../img/loupe.svg");
+      padding-right: 2rem;
+      margin-right: 3rem;
+    }
+
+/* Search */
+.search {
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  padding-top: .4rem;
+}
+  .search label {
+    margin-right: .3rem;
+  }
+  .search #q {
+    border: 1px solid #979797;
+    padding: .3rem;
+    background: no-repeat 99% center/11% url("../img/loupe_gray.svg");
+  }
+
+#search-amendements {
+  padding: 1rem;
+  background: white;
+  box-shadow: 0 7px 7px -1px #ccc;
+  margin-bottom: 1rem;
+}
+
+.number-with-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Secondary nav */
+nav.secondary {
+  display: flex;
+  justify-content: space-between;
+  background: #f6f7fa;
+  padding: .6rem 3rem .4rem 3rem;
+  border: 1px solid #d9d9d9;
+  border-left: none;
+  border-right: none;
+  margin-bottom: 1.5rem;
+  margin-top: -7px; /* Size of the above box shadow */
+  box-shadow: 0 7px 7px -1px #ccc;
+}
+  nav.bottom.secondary {
+    margin: auto auto 0;
+    width: 100%;
+  }
+.arrow-left,
+.arrow-right {
+  color: #3167a6;
+  text-decoration: none;
+  padding: .7rem;
+}
+  .arrow-left {
+    padding-left: 1.5rem;
+    background: no-repeat left 45%/.8rem url("../img/big_left.svg");
+  }
+  .arrow-right {
+    padding-right: 1.5rem;
+    background: no-repeat right 45%/.8rem url("../img/big_right.svg");
+  }
+
+/* Amendements */
+  .box {
+    background: white;
+    border: 1px solid #d9d9d9;
+    box-shadow: 0 7px 7px -1px #ccc;
+    margin: 0 3rem 1.5rem 3rem;
+    padding: 1.2rem;
+  }
+
+  article {
+    margin: 1.5rem 3rem;
+    box-shadow: 0 5px 5px 2px #ccc;
+  }
+  article.sous-amendement {
+    margin: -1.4rem 3rem 1rem 5rem;
+  }
+  /* Useful to stay below the sticky Article's header. */
+  .fake-anchor {
+    display: block;
+    position: relative;
+    top: calc(-5rem - 50px);
+    visibility: hidden;
+  }
+  h2 {
+    margin: .6rem 12rem .2rem 0;
+    line-height: 1.2;
+    font-size: 1.6rem;
+  }
+  h4 {
+    position: relative;
+    font-size: 30px;
+    z-index: 1;
+    overflow: hidden;
+    text-align: center;
+  }
+  h4:before, h4:after {
+    position: absolute;
+    top: 48%;
+    overflow: hidden;
+    width: 45%;
+    height: 1px;
+    content: '\a0';
+    background-color: #9b9b9b;
+    margin-left: 5%;
+  }
+  h4:before {
+    margin-left: -50%;
+    text-align: right;
+  }
+
+  .title {
+    position: -webkit-sticky;
+    position: sticky;
+    background: white;
+    top: 51px;
+    z-index: 3;
+  }
+
+  section > header {
+    min-height: 5rem;
+    box-shadow: 0 7px 7px -1px #ccc;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: .5rem;
+  }
+    .wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 0;
+    }
+      .wrapper > a.button {
+        margin-right: 3rem;
+      }
+    .titles {
+      flex-basis: 100%;
+      font-family: "source_serif_pro";
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      color: #3167a6;
+      margin-left: 3rem;
+    }
+      .titles h2 {
+        font-size: 1.7rem;
+        margin: 0;
+        line-height: 1;
+        padding-top: .8rem;
+      }
+      .titles h3 {
+        font-size: 1rem;
+        margin: 0;
+        font-weight: normal;
+      }
+
+
+  article header {
+    position: -webkit-sticky;
+    position: sticky;
+    background: white;
+    min-height: 5rem;
+    top: calc(50px + 5rem); /* Size of the nav + main header also sticky */
+    border-left: 8px solid;
+    padding: .5rem 1rem;
+    box-shadow: 0 5px 5px 2px #ccc;
+    z-index: 2;
+  }
+    article header div:first-child p {
+      font-size: .95rem;
+      margin-right: 12rem;
+      line-height: 1.2;
+    }
+    article header .authors {
+      margin-top: .4rem;
+    }
+    article header .button {
+      float: right;
+    }
+      article header .gouvernemental .button {
+        float: none;
+      }
+    article header hr {
+      margin: .5rem;
+      border: .5px solid #ccc;
+    }
+    article header div:last-child p {
+      margin: 1.2rem 1rem 1rem 0;
+      font-size: 1.2rem;
+    }
+      article header div:last-child p span {
+        font-weight: bold
+      }
+    article header div.gouvernemental {
+      text-align: right;
+      margin-bottom: .4rem;
+    }
+
+  details div {
+    padding: .1rem 1rem;
+  }
+
+  .amendement-detail {
+    padding: 1rem;
+    border: 1px solid #e9e5e5;
+    border-left: 8px solid;
+    line-height: 1.7;
+    background: white;
+  }
+    .amendement-detail h3 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: .4rem;
+      margin-top: 2.5rem;
+      text-align: center;
+    }
+    .amendement-detail h4 {
+      font-size: x-large;
+      font-weight: 600;
+      margin-bottom: .4rem;
+    }
+    .amendement-detail h3:first-child,
+    .amendement-detail h4:first-child {
+      margin-top: .4rem;
+    }
+    .amendement-detail div * {
+      max-width: 47rem;
+      margin: .5rem auto;
+    }
+    .amendement-detail div table {
+      border-collapse: collapse;
+    }
+    .amendement-detail div td {
+      border: 1px solid black;
+      padding: .2rem 1rem;
+    }
+  .reponse-detail {
+    font-size: x-large;
+    padding: 1rem;
+    border: 1px solid #e9e5e5;
+    border-left: 8px solid;
+    background: white;
+  }
+    .reponse-detail h4 {
+      font-size: xx-large;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      margin-top: 3.5rem;
+    }
+    .reponse-detail div * {
+      max-width: 47rem;
+      margin: .5rem auto;
+    }
+    .reponse-detail .bottom {
+      font-size: initial;
+    }
+  .article h2.article-title {
+    text-align: center;
+    margin: 1rem 1rem 2rem;
+  }
+  .article dt {
+    border-radius: 5rem;
+    background: white;
+    float: left;
+    height: 2rem;
+    width: 2rem;
+    padding: .3rem;
+    margin-top: .1rem;
+    font-size: small;
+    border: 2px solid black;
+    font-family: "source_serif_pro";
+  }
+  .positive {
+    border-left-color: #b8e986;
+  }
+  .sagesse {
+    border-left-color: #6db4ff;
+  }
+  .negative {
+    border-left-color: #d0021b;
+  }
+  .gouvernemental header {
+    border: 4px solid #3167a6;
+  }
+    .gouvernemental h2 {
+      color: #3167a6;
+    }
+    .gouvernemental .positive {
+      border-left-color: #3167a6;
+    }
+  span.avis.positive {
+    color: #5fa014;
+  }
+  span.avis.sagesse {
+    color: #3167a6;
+  }
+  span.avis.negative {
+    color: #d0021b;
+  }
+  .gouvernemental .author {
+    color: #3167a6;
+    font-weight: 600;
+  }
+  .presentation p {
+    margin-top: 0;
+  }
+  .presentation strong {
+    font-weight: 600;
+  }
+
+  .group-color {
+    display: inline-block;
+    width: .6rem;
+    height: .6rem;
+    border-radius: 1rem;
+  }
+  .authors .author {
+    white-space: nowrap;
+  }
+  .d-none,
+  .is-none {
+    display: none;
+  }
+  .is-block {
+    display: block;
+  }
+  .is-flex {
+    display: flex;
+  }
+  .bottom {
+    text-align: right;
+    padding-right: 1rem;
+    margin: 5rem auto 1.5rem;
+  }
+  .menu {
+    font-family: "source_serif_pro";
+    font-size: large;
+  }
+  a.button {
+    padding: .7rem 1.2rem .5rem 2.9rem;
+    text-decoration: none;
+    border: 1px solid #3167a6;
+    color: #3167a6;
+    border-radius: .3rem;
+    font-weight: 600;
+    background: no-repeat .3rem url("../img/blue_eye.svg");
+  }
+    a.button.arrow {
+      background-color: #3167a6;
+      color: white;
+      box-shadow: inset 1px 1px 3px 0 rgba(0,0,0,0.50);
+    }
+    a.button.arrow-up {
+      background-image: url("../img/arrow_up.svg");
+    }
+    a.button.arrow-down {
+      background-image: url("../img/arrow_down.svg");
+    }
+  div.article {
+    border: 1px solid #e9e5e5;
+    border-left: 8px solid black;
+    padding: 1rem;
+    margin: 1rem 0;
+    background: white;
+  }
+  div.article {
+    border-left-color: #6c7a89;
+  }
+  div.gouvernemental {
+    border-left-color: #3167a6;
+  }
+
+  .error {
+    border: 1px solid red;
+    background: white;
+    color: red;
+    text-align: center;
+    padding: 1rem 1.5rem;
+    margin: 0 1rem;
+  }
+  .hide {
+    display: none;
+  }
+  .hint {
+    color: #565656;
+    font-size: .8rem;
+    font-weight: normal;
+    margin-top: .2rem;
+  }
+
+/* Inputs */
+input {
+  font-size: 1.1rem;
+}
+  input[type="submit"] {
+    padding: .6rem 2rem;
+    margin-left: 2rem;
+    border: 1px solid #3167a6;
+    color: #3167a6;
+    background-color: white;
+    border-radius: .3rem;
+    -webkit-appearance: none;
+  }
+    input[type="submit"]:hover {
+      border-color: #3167a6;
+      color: white;
+      background-color: #3167a6;
+    }
+
+/* Clear arrows from number input fields. */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance:textfield;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+  table td {
+    padding: .4rem .6rem;
+    border: 1px solid #565656;
+  }
+    table td p {
+      margin: 0;
+    }

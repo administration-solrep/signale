@@ -1,0 +1,37 @@
+{% extends "_base_lecture.html" %}
+{% import "macros.html" as macros %}
+
+{% block header %}
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/css/shared_table.css') }}">
+{% endblock %}
+
+{% block body %}
+    {% if shared_table is defined %}
+        <h1>Modifier cette Corbeille</h1>
+    {% else %}
+        <h1>Créer une Corbeille</h1>
+    {% endif %}
+    <form action="{{ request.path }}" method="POST">
+        <div class="form-group">
+            <label for="titre">Nom de la Corbeille :</label>
+            <input type="text" name="titre" {% if shared_table is defined %}value="{{ shared_table.titre }}"{% endif %} required>
+        </div>
+        <div class="form-group save-buttons">
+            {% if shared_table is defined %}
+                {% if shared_table.amendements %}
+                    <a class="button button-sm disabled">
+                        Supprimer
+                    </a>
+                {% else %}
+                    <a class="button button-sm danger" href="{{ request.resource_url(context, 'delete') }}">
+                        Supprimer
+                    </a>
+                {% endif %}
+                <input type="submit" name="submit" value="Valider" class="button primary">
+            {% else %}
+                <input type="submit" name="submit" value="Créer la Corbeille" class="button primary">
+            {% endif %}
+        </div>
+
+    </form>
+{% endblock %}

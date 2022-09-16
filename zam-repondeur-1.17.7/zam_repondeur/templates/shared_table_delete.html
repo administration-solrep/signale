@@ -1,0 +1,19 @@
+{% extends "_base_lecture.html" %}
+{% import "macros.html" as macros %}
+
+{% block header %}
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/css/shared_table.css') }}">
+{% endblock %}
+
+{% block body %}
+    <h1>Supprimer la Corbeille « {{ shared_table.titre }} »</h1>
+    <p class="notice warning">
+        Vous êtes sur le point de supprimer cette Corbeille.
+    </p>
+    <form action="{{ request.path }}" method="POST">
+        <div class="form-group save-buttons delete-box">
+            <input type="submit" name="submit" value="Confirmer la suppression" class="button warning">
+        </div>
+
+    </form>
+{% endblock %}

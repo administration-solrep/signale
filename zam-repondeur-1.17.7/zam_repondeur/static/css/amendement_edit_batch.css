@@ -1,0 +1,50 @@
+.box,
+.box.edit {
+    padding: 0;
+}
+.box > *:not(.batch) {
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+.box .notice {
+    margin-left: 2rem;
+    margin-right: 2rem;
+}
+.batch {
+    text-align: center;
+    background: #d6eaff;
+    margin: 0 0 3rem 0;
+    padding: .5rem 1rem;
+    min-height: 2.8rem;
+}
+.batch p {
+    margin-bottom: 0;
+    padding-top: .3rem;
+}
+.batch .button {
+    border-color: white;
+    color: white;
+    font-size: .9rem;
+    padding: 0.3rem 1.5rem 0.1rem 1.5rem;
+}
+.batch .button:hover {
+    border-color: white;
+    color: #3167a6;
+    background: white;
+}
+.content .batch {
+    background: #3167a6;
+    color: white;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+.content .batch a {
+    color: white;
+    padding: 0 1rem;
+}
+.content .batch .current {
+    margin: 0 1rem;
+    border-bottom: 3px solid white;
+}

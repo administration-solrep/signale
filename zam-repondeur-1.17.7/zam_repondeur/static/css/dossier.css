@@ -1,0 +1,268 @@
+label[for="emails"] {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+main.box.dossier-main,
+main.dossier-main {
+    max-width: 60rem;
+    margin: 2rem auto;
+}
+
+.extra-button.refresh {
+    display: block;
+    text-align: right;
+    margin-right: .8rem;
+}
+
+.extra-button.contact-admins {
+    max-width: 60rem;
+    margin: 3rem auto;
+}
+
+.extra-button {
+    margin-top: 1rem;
+    justify-content: center;
+}
+    .extra-button .button:not(input) {
+        color: #3167a6;
+        border: 1px solid #3167a6;
+        background-color: #fff;
+    }
+    .extra-button .button:hover:not(input) {
+        background-color: #3167a6;
+        color: #fff;
+    }
+
+.extra-button.lecture,
+.extra-button.dossier.box {
+    justify-content: center;
+}
+
+.lecture {
+    margin: 2rem 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    position: relative;
+}
+.lecture:first-child {
+    margin-top: 2rem;
+}
+.lecture nav {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    flex-direction: column;
+    text-align: right;
+    min-width: 250px;
+}
+.lecture nav a {
+    font-size: 1.1rem;
+    padding-right: 1.8rem;
+    background-position: 99% 42%;
+    background-size: 5%;
+    overflow: hidden;
+}
+.lecture nav a:first-child {
+    font-size: 1.7rem;
+    padding-right: 2rem;
+    background-position: right 40%;
+    background-size: 7%;
+}
+.lecture .details {
+    line-height: 1.2;
+}
+.lecture.box.notice {
+    visibility: visible;
+    opacity: 1;
+    transition: visibility 0s, opacity 0.5s linear, height 0.5s linear;
+    margin-top: 1rem;
+}
+.lecture.box.notice.v-hidden {
+    visibility: hidden;
+    opacity: 0;
+    height: 0;
+}
+
+h2:not(.main-titre) {
+    text-align: center;
+    font-weight: 600;
+    margin: 2.5rem 0 1.5rem 0;
+}
+.button .icon {
+    border-left: none;
+    width: 1.8rem;
+    margin: 0 0 -.2rem 0;
+}
+
+.icon-sync {
+    position: absolute;
+    width: 0;
+    height: 0;
+}
+
+.bloc {
+    margin-top: 50px;
+}
+.justified {
+    text-align: justify;
+}
+.contact {
+    text-align: center;
+}
+.contact a.primary {
+    margin: 2rem 1rem;
+}
+
+#bottom-nav {
+    margin-top: 5rem;
+    margin-bottom: 3rem;
+}
+.box_contacts {
+    margin: 2rem 0.5rem;
+}
+.box_contacts a {
+    margin: auto;
+    display: table;
+}
+.indications {
+    display: inline-block;
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-left: 0.5rem;
+    cursor: pointer;
+}
+.indications:hover {
+    color: #555;
+}
+
+/* Dossier liste */
+.relative {
+    position: relative;
+}
+.dossier-main .main-titre {
+    margin: 4rem 0 2rem 2rem;
+}
+.dossier-main .dossier.box h3 {
+    line-height: normal;
+}
+.dossier-main .dossier {
+    margin: 2rem 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+}
+.dossier-main .dossier:first-child {
+    margin-top: 2rem;
+}
+.dossier-main .dossier nav {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    flex-direction: column;
+    text-align: right;
+    margin-left: 2rem;
+}
+.dossier-main .dossier nav a {
+    font-size: 1.1rem;
+    padding-right: 1.8rem;
+    background-position: 99% 42%;
+    background-size: 5%;
+}
+.dossier-main .dossier nav a:first-child {
+    font-size: 1.7rem;
+    padding-right: 2rem;
+    background-position: right 40%;
+    background-size: 7%;
+}
+.dossier-main .dossier .details {
+    line-height: 1.2;
+}
+
+main.dossier-main div.selectize-control.single div.item {
+    max-width: 44.5rem;
+}
+form#add-dossier div.selectize-control.single div.item {
+    max-width: 53rem;
+}
+
+/* Mise à jour dérouleurs */
+.maj-form {
+    position: absolute;
+    top: -15px;
+    left: -20px;
+}
+.maj-button {
+    background-color: #3167a6;
+    border: none;
+    border-radius: 20px;
+    position: inherit;
+    padding: 10px;
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+    color: transparent;
+    display: ruby;
+}
+    .maj-button.disabled {
+        background-color: #bbb;
+    }
+    .maj-button svg {
+        color: #fff;
+        width: 40px;
+        padding: 5px;
+        position: inherit;
+        left: 0;
+        top: 0;
+    }
+    .maj-button, .maj-button svg {
+        transition: all 0.2s ease;
+        -o-transition: all 0.2s ease;
+        -moz-transition: all 0.2s ease;
+        -webkit-transition: all 0.2s ease;
+    }
+    .maj-button:hover > svg {
+        transform: rotate(180deg);
+        -o-transform: rotate(180deg);
+        -moz-transform: rotate(180deg);
+        -webkit-transform: rotate(180deg);
+    }
+    .maj-button:hover {
+        cursor: pointer;
+        width: 20rem;
+        color: #fff;
+        text-align: left;
+        padding-left: 40px;
+    }
+    .maj-button.disabled:hover {
+        width: 18.5rem;
+    }
+
+.archives {
+    float: right;
+}
+.archives a {
+    padding-right: 1.5rem;
+	font-size: 1.3rem;
+}
+
+/* Alerte flag dossier */
+form.alert-form.alert-big {
+    top: 1rem;
+    right: 1rem;
+}
+form.alert-form.alert-big .alert-maj {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 2rem;
+    font-size: 18px;
+}
+form.alert-form.alert-big svg.alert-svg {
+    width: 2.5rem;
+    height: 2.5rem;
+}
+form.alert-form.alert-big .alert-maj:hover {
+    width: 26rem;
+}

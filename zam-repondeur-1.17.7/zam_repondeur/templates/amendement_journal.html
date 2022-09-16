@@ -1,0 +1,21 @@
+{% extends "_base.html" %}
+{% import "macros.html" as macros with context %}
+
+{% block title %}
+    {{ lecture }} • {{ lecture.dossier.titre }} • Signale
+{% endblock %}
+
+{% block header %}
+    <link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/journal.css') }}">
+{% endblock %}
+
+{% block body %}
+    {{ macros.msg_readonly(active, 0) }}
+
+    <a href="{{ back_url }}" class="arrow-left">Retour</a>
+    <h1>Journal des modifications</h1>
+    <div class="title-extras">
+        Amendement {{ amendement }}
+    </div>
+    {{ macros.timeline(amendement.events, today) }}
+{% endblock %}

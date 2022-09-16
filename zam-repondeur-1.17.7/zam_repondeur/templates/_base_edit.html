@@ -1,0 +1,51 @@
+{% extends "_base.html" %}
+
+
+{% block header %}
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/css/base_edit.css') }}">
+    <style type="text/css">
+        .journal .arrow-right {
+            background: no-repeat right 30%/7% url("{{ request.static_url('zam_repondeur:static/img/big_right.svg') }}");
+        }
+    </style>
+{% endblock %}
+
+{% block main_class %}edit{% endblock %}
+
+{% block scripts %}
+    <script src="{{ request.static_url('zam_repondeur:static/js/unsaved.js') }}"></script>
+    <script src="{{ request.static_url('zam_repondeur:static/tinymce-5-8-2/tinymce.min.js') }}"></script>
+    <script type="text/javascript">
+        tinymce.init({
+            selector: 'textarea.editable',
+            language: 'fr_FR',
+            menubar: false,
+            plugins: 'lists fullscreen paste table',
+            toolbar:
+                'undo redo | formatselect | bold italic removeformat | bullist numlist | alignleft aligncenter alignright alignjustify | table | cut copy paste | fullscreen',
+            branding: false,
+            elementpath: false,
+            content_style: 'p, li { line-height: 1.5; margin: 1em 0; } ol { padding-left: 1rem; }',
+            block_formats: 'Paragraphe=p;Titre=h3',
+            browser_spellcheck: true,
+            init_instance_callback: function(editor) {
+                editor.on('Dirty', event => {
+                    form = document.getElementById('edit-amendement')
+                    if(form == null){
+                        form = document.getElementById('batch-amendements')
+                        if(form == null){
+                            form = document.getElementById('copy-amendements')
+                        }
+                    }
+
+                    const controller = application.getControllerForElementAndIdentifier(
+                        form,
+                        'unsaved-changes'
+                    )
+                    controller.setDirty()
+                })
+            }
+        })
+    </script>
+    {% block extra_scripts %}{% endblock %}
+{% endblock %}

@@ -1,0 +1,19 @@
+<p>
+{% if amendement.location.batch %}
+Le lot d’amendements n°<a href="{{ amendement_url }}" >{{ amendement.location.batch.nums_disp | enumeration }}</a> de la lecture <a href="{{ lecture_url }}">{{ lecture }}</a> du dossier <a href="{{ dossier_url }}">{{ dossier }}</a> a été sorti de la corbeille « Dossier de banc ».
+{% else %}
+L’amendement n°<a href="{{ amendement_url }}">{{ amendement.num_disp }}</a> de la lecture  <a href="{{ lecture_url }}">{{ lecture }}</a> du dossier <a href="{{ dossier_url }}">{{ dossier }}</a> a été sorti de la corbeille « Dossier de banc ».
+{% endif %}
+</p>
+
+<p>
+Cette action a été réalisée par {{ user }}.
+</p>
+
+<p>
+Bonne journée !
+</p>
+
+<p>
+Ce message est généré automatiquement. Merci de ne pas y répondre.
+</p>

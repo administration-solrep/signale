@@ -1,0 +1,304 @@
+{% extends "_base.html" %}
+{% import "macros.html" as macros with context %}
+
+{% block title %}
+    {{ lecture }} • {{ lecture.dossier.titre }} • Signale
+{% endblock %}
+
+{% block header %}
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/selectize/css/selectize.css') }}">
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/selectize/css/selectize.bootstrap3.css') }}">
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/css/transfer.css') }}">
+{% endblock %}
+
+{% block extra_nav %}
+    <li>
+        <a href="{{ request.resource_url(context, 'tables', request.user.email) }}">
+            Mon espace de travail
+        </a>
+    </li>
+    <li>
+        <a href="{{ request.resource_url(context, 'amendements') }}">
+            Dérouleur
+        </a>
+    </li>
+    <li>
+        <a href="{{ request.resource_url(context, 'corbeilles') }}">
+            Corbeilles
+        </a>
+    </li>
+    {% if lecture.displayable %}
+        <li>
+            <a href="{{ request.resource_url(context, 'articles') }}" target="_blank" rel="noopener noreferrer">
+                Dossier de banc
+            </a>
+        </li>
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <nav class="back">
+        <a href="{{ back_url }}" class="arrow-left">
+            {% if from_index %}
+                Retourner au dérouleur
+            {% elif from_search %}
+                Retourner à la page de recherche
+            {% else %}
+                Retourner à mon espace de travail
+            {% endif %}
+        </a>
+    </nav>
+    <h1>
+        Transférer
+        {% if amendements|length_including_batches > 1 %}
+            les amendements
+        {% else %}
+            l’amendement
+        {% endif %}
+        {% if from_save %}
+            {% set amendement = amendements_with_table[0] %}
+            {{ macros.numero_amendement(amendement) }}
+        {% endif %}
+    </h1>
+
+    {% if direct_transfer %}
+    <p class="alert-transfer-direct">
+        Le transfert direct ne peut s'effectuer pour l'une des raisons suivantes :
+        au moins un des amendements sélectionnés pour le transfert est en cours d'édition ou se
+        trouve dans un autre espace de travail ou dans la corbeille « Dossier de banc ».
+    </p>
+    {% endif %}
+
+    <form id="transfer_multiple_choices"
+        action="{{ request.resource_url(context['tables'], request.user.email) }}"
+        method="POST"
+        data-controller="transfers">
+
+        <div class="infos">
+            {% if from_save %}
+                {% set amendement = amendements_with_table[0] %}
+                <input type="hidden" name="nums" value="{{ amendement.num }}" id="amendement-{{ amendement.num }}">
+            {% else %}
+                {% if amendements_on_dossier_de_banc %}
+                    <details class="notice danger" open>
+                        <summary>
+                            {% trans count=amendements_on_dossier_de_banc|length_including_batches %}
+                                Cet amendement <strong>est dans la Corbeille « Dossier de banc »</strong>
+                            {% pluralize %}
+                                Ces {{ count }} amendements <strong>sont dans la Corbeille « Dossier de banc »</strong>
+                            {% endtrans %}
+                        </summary>
+                        <ul class="amendements" data-target="transfers.amendementsFromDossierDeBanc">
+                            {% for amendement in amendements_on_dossier_de_banc %}
+                                <li>
+                                    <input type="checkbox" name="nums" value="{{ amendement.num }}" id="amendement-{{ amendement.num }}" data-action="transfers#check">
+                                    <label for="amendement-{{ amendement.num }}">
+                                        {{ macros.numero_amendement(amendement)}}
+                                    </label>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </details>
+                {% endif %}
+                {% if amendements_being_edited %}
+                    <details class="notice danger" open>
+                        <summary>
+                            {% trans count=amendements_being_edited|length_including_batches %}
+                                Cet amendement <strong>est en cours d’édition par quelqu’un d’autre</strong>.
+                                Si vous transférez cet amendement, <strong>ses modifications ne seront pas enregistrées</strong>.
+                            {% pluralize %}
+                                Ces amendements <strong>sont en cours d’édition par d’autres personnes</strong>.
+                                Si vous transférez ces amendements, <strong>les modifications ne seront pas enregistrées</strong>.
+                            {% endtrans %}
+                        </summary>
+                        <ul class="amendements" data-target="transfers.amendementsWithTableActive">
+                            {% for amendement in amendements_being_edited|sort(attribute="location.user_table") %}
+                                {% set amendement_user = amendement.location.user_table.user %}
+                                <li>
+                                    <input type="checkbox" name="nums" value="{{ amendement.num }}" id="amendement-{{ amendement.num }}"  data-action="transfers#check">
+                                    <label for="amendement-{{ amendement.num }}">
+                                        {{ macros.numero_amendement(amendement)}}
+                                         —
+                                        {% if amendement_user == request.user %}
+                                            {% if amendement.location.batch %}
+                                                Ces amendements sont sur votre espace de travail
+                                            {% else %}
+                                                Cet amendement est sur votre espace de travail
+                                            {% endif %}
+                                        {% else %}
+                                            {{ macros.user_activity(amendement_user) }}
+                                        {% endif %}
+                                    </label>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </details>
+                {% endif %}
+                {% if amendements_not_being_edited %}
+                    <details class="notice warning" open>
+                        <summary>
+                            {% trans count=amendements_not_being_edited|length_including_batches %}
+                                Cet amendement <strong>est déjà sur l'espace de travail de quelqu’un</strong>.
+                            {% pluralize %}
+                                Ces amendements <strong>sont déjà sur l'espace de travail de quelqu’un</strong>.
+                            {% endtrans %}
+                        </summary>
+                        <ul class="amendements" data-target="transfers.amendementsWithTableInactive">
+                            {% for amendement in amendements_not_being_edited|sort(attribute="location.user_table") %}
+                                {% set amendement_user = amendement.location.user_table.user %}
+                                <li>
+                                    <input type="checkbox" name="nums" value="{{ amendement.num }}" id="amendement-{{ amendement.num }}" checked data-action="transfers#check">
+                                    <label for="amendement-{{ amendement.num }}">
+                                        {{ macros.numero_amendement(amendement)}}
+                                         —
+                                        {{ macros.user_activity(amendement_user) }}
+                                    </label>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </details>
+                {% endif %}
+            {% endif %}
+            {% if amendements_with_shared_table %}
+                <details class="notice" {% if not amendements_being_edited or amendements_not_being_edited %}open{% endif %}>
+                    <summary>
+                        {% trans count=amendements_with_shared_table|length_including_batches %}
+                            Cet amendement est dans une Corbeille
+                        {% pluralize %}
+                            Ces {{ count }} amendements sont dans une Corbeille
+                        {% endtrans %}
+                    </summary>
+                    <ul class="amendements">
+                        {% for amendement in amendements_with_shared_table %}
+                            <li>
+                                <input type="checkbox" name="nums" value="{{ amendement.num }}" id="amendement-{{ amendement.num }}" checked>
+                                <label for="amendement-{{ amendement.num }}">
+                                    {{ macros.numero_amendement(amendement)}}
+                                     —
+                                    {% if amendement.location.batch %}
+                                        Ces amendements sont dans la Corbeille « {{ amendement.location.shared_table.titre }} »
+                                    {% else %}
+                                        Cet amendement est dans la Corbeille « {{ amendement.location.shared_table.titre }} »
+                                    {% endif %}
+                                </label>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </details>
+            {% endif %}
+            {% if not from_save and amendements_on_my_table %}
+                <details class="notice" {% if not amendements_on_dossier_de_banc and not amendements_being_edited and not amendements_not_being_edited %}open{% endif %}>
+                    <summary>
+                        {% trans count=amendements_on_my_table|length_including_batches %}
+                            Cet amendement est sur votre espace de travail
+                        {% pluralize %}
+                            Ces {{ count }} amendements sont sur votre espace de travail
+                        {% endtrans %}
+                    </summary>
+                    <ul class="amendements">
+                        {% for amendement in amendements_on_my_table %}
+                            <li>
+                                <input type="checkbox" name="nums" value="{{ amendement.num }}" id="amendement-{{ amendement.num }}" checked>
+                                <label for="amendement-{{ amendement.num }}">
+                                    {{ macros.numero_amendement(amendement)}}
+                                </label>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </details>
+            {% endif %}
+            {% if amendements_without_table %}
+                <details class="notice" {% if not amendements_on_dossier_de_banc and not amendements_being_edited and not amendements_not_being_edited %}open{% endif %}>
+                    <summary>
+                        {% trans count=amendements_without_table|length_including_batches %}
+                            Cet amendement est sur le dérouleur
+                        {% pluralize %}
+                            Ces {{ count }} amendements sont sur le dérouleur
+                        {% endtrans %}
+                    </summary>
+                    <ul class="amendements">
+                        {% for amendement in amendements_without_table %}
+                            <li>
+                                <input type="checkbox" name="nums" value="{{ amendement.num }}" id="amendement-{{ amendement.num }}" checked>
+                                <label for="amendement-{{ amendement.num }}">
+                                    {{ macros.numero_amendement(amendement)}}
+                                </label>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </details>
+            {% endif %}
+            {% if from_index %}
+                <input type="hidden" name="from_index" value="{{ from_index }}">
+            {% endif %}
+            <div class="targets">
+                <label for="target">Destination</label>
+                <select id="target" name="target">
+                    <option selected></option>
+                    {% if show_transfer_to_myself %}
+                        <optgroup label="Mon espace de travail">
+                            <option value="{{ request.user.email }}">{{ request.user }}</option>
+                        </optgroup>
+                    {% endif %}
+                    {% if target_tables %}
+                        <optgroup label="Corbeille">
+                            {% for target_table in target_tables %}
+                                <option value="{{ target_table.slug }}">{{ target_table.titre }}</option>
+                            {% endfor %}
+                        </optgroup>
+                    {% endif %}
+                    {% if users %}
+                        <optgroup label="Espaces de travail">
+                            {% for email, display_name in users %}
+                                <option value="{{ email }}">{{ display_name }}</option>
+                            {% endfor %}
+                        </optgroup>
+                    {% endif %}
+                </select>
+            </div>
+            <div class="buttons">
+                <input type="submit"
+                    name="submit-to"
+                    value="Transférer"
+                    class="button primary enabled"
+                    data-action="click->transfers#confirmTransfer"
+                    data-target="transfers.submitTo">
+            </div>
+        </div>
+        {% if show_transfer_to_index or show_transfer_to_dossier_de_banc %}
+            <h3 class="line-through">ou</h3>
+            <div class="buttons transfer-multiple-choices-custom">
+                <input type="submit"
+                    name="submit-index"
+                    value="Transférer au dérouleur"
+                    class="button primary"
+                    data-action="click->transfers#confirmTransfer"
+            {% if not show_transfer_to_index %}
+                    hidden
+            {% endif %}
+                    data-target="transfers.submitIndex">
+                <input type="submit"
+                    name="submit-dossier-banc"
+                    value="Transférer dans la corbeille « Dossier de banc »"
+                    class="button primary"
+            {% if not show_transfer_to_dossier_de_banc %}
+                    hidden
+            {% endif %}
+                    data-target="transfers.submitDossierBanc">
+            </div>
+        {% endif %}
+    </form>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ request.static_url('zam_repondeur:static/js/transfers.js') }}"></script>
+{% if amendements_with_table or amendements_on_dossier_de_banc and not from_save %}
+    <script>;(() => application.register('transfers', Transfers))()</script>
+{% endif %}
+<script src="{{ request.static_url('zam_repondeur:static/selectize/js/standalone/selectize.min.js') }}"></script>
+<script src="{{ request.static_url('zam_repondeur:static/selectize/plugins/selectize-plugin-a11y.js') }}"></script>
+<script src="{{ request.static_url('zam_repondeur:static/selectize/plugins/selectize_no_results.js') }}"></script>
+<script type="text/javascript">
+    ;(_ => $("#target").selectize({plugins: ['no_results', 'selectize-plugin-a11y']}))()
+</script>
+{% endblock %}

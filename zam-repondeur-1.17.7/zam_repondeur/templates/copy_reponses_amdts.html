@@ -1,0 +1,93 @@
+{% extends "_base_edit.html" %}
+{% import "macros.html" as macros with context %}
+
+{% block title %}
+    {{ lecture }} • {{ lecture.dossier.titre }} • Signale
+{% endblock %}
+
+{% block header %}
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/css/batch_amendements.css') }}">
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/css/switch.css') }}">
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/selectize/css/selectize.css') }}">
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/selectize/css/selectize.bootstrap3.css') }}">
+{% endblock %}
+
+{% block main_class %}box{% endblock %}
+
+{% block extra_nav %}
+    <li>
+        <a href="{{ request.resource_url(context, 'tables', request.user.email) }}">
+            Mon espace de travail
+        </a>
+    </li>
+    <li>
+        <a href="{{ request.resource_url(context, 'amendements') }}">
+            Dérouleur
+        </a>
+    </li>
+    <li>
+        <a href="{{ request.resource_url(context, 'corbeilles') }}">
+            Corbeilles
+        </a>
+    </li>
+    {% if lecture.displayable %}
+        <li>
+            <a href="{{ request.resource_url(context, 'articles') }}" target="_blank" rel="noopener noreferrer">
+                Dossier de banc
+            </a>
+        </li>
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <nav class="back">
+        <a href="{{ back_url }}" class="arrow-left">Retourner à mon espace de travail</a>
+    </nav>
+    <h1>
+        Copier une réponse
+    </h1>
+    <form id="copy-amendements"
+        action="{{ request.resource_url(context, 'copy_amendements') }}"
+        data-controller="unsaved-changes"
+        data-action="beforeunload@window->unsaved-changes#beforeUnload unload@window->unsaved-changes#unload"
+        data-unsaved-changes-dirty="false"
+        data-unsaved-changes-start-editing-url="{{ request.resource_url(context, 'start_editing_copy', query={'nums':nums}) }}"
+        data-unsaved-changes-stop-editing-url="{{ request.resource_url(context, 'stop_editing_copy', query={'nums':nums}) }}"
+        method="POST">
+        <div class="notice">
+            <details open>
+                <summary>
+                    Une réponse unique va être assignée à l'ensemble de ces amendements.
+                </summary>
+                <ul class="amendements">
+                    {% for amendement in amendements %}
+                        <li>
+                            <input type="checkbox" name="nums" value="{{ amendement.num }}" id="amendement-{{ amendement.num }}" checked>
+                            <label for="amendement-{{ amendement.num }}">
+                                {{ macros.numero_amendement(amendement) }}
+                            </label>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </details>
+
+            {{ macros.form_reponse(amendements, avis, False) }}
+        </div>
+        <input type="hidden" name="hidden-nums" value="{{ nums }}">
+        <div class="buttons">
+            <input type="submit"
+                name="submit-to"
+                value="Copier la réponse"
+                class="button primary enabled"
+                data-action="click->unsaved-changes#allowFormSubmission">
+        </div>
+    </form>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{{ request.static_url('zam_repondeur:static/dompurify/purify.min.js') }}"></script>
+    <script src="{{ request.static_url('zam_repondeur:static/selectize/js/standalone/selectize.min.js') }}"></script>
+    <script src="{{ request.static_url('zam_repondeur:static/selectize/plugins/selectize-plugin-a11y.js') }}"></script>
+    <script src="{{ request.static_url('zam_repondeur:static/selectize/plugins/selectize_no_results.js') }}"></script>
+    <script src="{{ request.static_url('zam_repondeur:static/js/selectize_amdts.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "_base.html" %}
+{% import "macros.html" as macros with context %}
+
+{% block title %}
+    {{ lecture }} • {{ lecture.dossier.titre }} • Signale
+{% endblock %}
+
+{% block header %}
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/selectize/css/selectize.css') }}">
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/selectize/css/selectize.bootstrap3.css') }}">
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/css/transfer.css') }}">
+{% endblock %}
+
+{% block body %}
+    <nav class="back">
+        <a href="{{ request.resource_url(context, 'corbeilles') }}" class="arrow-left">Retourner à la page des corbeilles</a>
+    </nav>
+
+    <h1>Importer des corbeilles</h1>
+    <h2 class="subtitle">{{ lecture.dossier.titre }}</h2>
+    <p class="subtitle">{{ lecture }}</p>
+
+    <form id="import-corbeilles"
+        action="{{ request.resource_url(context, 'import_corbeilles') }}"
+        method="POST">
+
+        <div class="infos">
+            <div class="targets lectures">
+                <label for="target">Lecture</label>
+                <select id="target" name="target" placeholder="Sélectionner une lecture…">
+                    <option selected></option>
+                    {% for other_lecture in lectures|reverse %}
+                        <option value="{{ other_lecture.pk }}">{{ other_lecture }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            {% for other_lecture in lectures %}
+            <details id="other_lecture-{{ other_lecture.pk }}" class="notice d-none" open>
+                <summary>
+                    {% if shared_tables[other_lecture.pk] %}
+                        {% trans count=shared_tables[other_lecture.pk]|length %}
+                            Il y a {{ count }} corbeille dans cette lecture :
+                        {% pluralize %}
+                            Il y a {{ count }} corbeilles dans cette lecture :
+                        {% endtrans %}
+                    {% else %}
+                        Il n'y a aucune corbeille dans cette lecture.
+                    {% endif %}
+                </summary>
+                <ul class="corbeilles">
+                    {% for corbeille in shared_tables[other_lecture.pk] %}
+                        <li>
+                            <input type="checkbox" name="corbeilles" value="{{ corbeille.titre }}" id="corbeille-{{ corbeille.pk }}">
+                            <label for="corbeille-{{ corbeille.pk }}">{{ corbeille.titre }}</label>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </details>
+            {% endfor %}
+
+            <div class="buttons">
+                <input type="submit"
+                    name="submit-to"
+                    value="Importer"
+                    class="button primary enabled">
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ request.static_url('zam_repondeur:static/selectize/js/standalone/selectize.min.js') }}"></script>
+<script src="{{ request.static_url('zam_repondeur:static/selectize/plugins/selectize-plugin-a11y.js') }}"></script>
+<script src="{{ request.static_url('zam_repondeur:static/selectize/plugins/selectize_no_results.js') }}"></script>
+<script type="text/javascript">
+    /* Liste déroulante recherche rapide */
+    document.addEventListener("DOMContentLoaded", () => {
+        var $select = $("#target").selectize({
+            plugins: ['no_results', 'selectize-plugin-a11y'],
+            onChange: function(value){
+                $('details.notice').addClass('d-none')
+                $('input[name="corbeilles"]').prop("checked", false)
+                $('details#other_lecture-' + value).removeClass('d-none')
+                $('details#other_lecture-' + value + ' input[name="corbeilles"]').prop("checked", true)
+            },
+            onLoad: function(){
+                this.clear()
+            }
+        })
+        var selectize = $select[0].selectize;
+        selectize.clear(true)
+    })
+</script>
+{% endblock %}

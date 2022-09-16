@@ -1,0 +1,38 @@
+{% extends "_base.html" %}
+{% import "macros.html" as macros %}
+
+{% block header %}
+<link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/manage.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/gestion.css') }}">
+{% endblock %}
+
+{% block body %}
+    <section data-controller="multiple-clicks">
+        <a href="{{ request.resource_url(context.parent) }}" class="arrow-left">Retour sur la liste des dossiers</a>
+
+        <h2>Gestion technique</h2>
+
+        <div class="bloc box">
+            <h4>Mise à jour du cache</h4>
+            <form action="{{ request.resource_url(context) }}" method="post" class="actions-buttons">
+                <input name="maj_cache_button" type="submit" class="button primary fixed-width" value="Mettre à jour" data-action="multiple-clicks#prevent" />
+            </form>
+        </div>
+
+        <div class="bloc box">
+            <h4>Système des alertes de mise à jour</h4>
+            <div>
+                <form action="{{ request.resource_url(context, 'switch_alerts') }}" method="post" class="actions-buttons">
+                    <input name="switch_alerts_button" type="submit" class="button primary enabled fixed-width" value="{{ 'Désactiver' if system_active else 'Activer' }} le système d'alerte" data-action="multiple-clicks#prevent" />
+                </form>
+                <form action="{{ request.resource_url(context, 'reset_alerts') }}" method="post" class="actions-buttons">
+                    <input name="reset_alerts_button" type="submit" class="button primary fixed-width" value="Réinitialiser les dossiers en erreur" data-action="multiple-clicks#prevent" />
+                </form>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ request.static_url('zam_repondeur:static/js/amendements.js') }}"></script>
+{% endblock %}

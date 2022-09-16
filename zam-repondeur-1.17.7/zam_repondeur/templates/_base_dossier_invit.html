@@ -1,0 +1,95 @@
+{% extends "_base.html" %}
+{% import "macros.html" as macros %}
+
+{% block header %}
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/css/dossier.css') }}" />
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/selectize/css/selectize.css') }}">
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/selectize/css/selectize.bootstrap3.css') }}">
+{% endblock %}
+
+{% block body %}
+    <form id="add-dossier"
+    action="{{ request.path }}"
+    method="POST"
+    data-controller="dossier-demande-invitation">
+        {% block titre_invit %}
+            <h2>Demander une invitation à un dossier</h2>
+        {% endblock %}
+        <p class="justified">
+            <big>
+             Si votre dossier législatif n'apparait pas, demandez une invitation au dossier en le choisissant dans la liste déroulante ou en saisissant directement dans la barre de recherche un mot correspondant au nom du dossier.
+            </big>
+        </p>
+        <div class="form-group">
+            {% block label_invit %}
+                <label for="dossier">Dossier législatif</label>
+            {% endblock %}
+            <select id="select-dossier"
+                    name="dossier"
+                    class="form-control"
+                    placeholder="{% if not list_mailto %}Aucun dossier disponible pour une demande d'invitation…{% else %}Choisir un dossier législatif…{% endif %}"
+                    autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    spellcheck="false">
+                <option value="" selected="selected"></option>
+                {% for titre, contact, subject in list_mailto %}
+                    <option value="mailto:{{ contact }}?subject={{ subject | urlencode }}">{{ titre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="bloc">
+            <div class="form-group save-buttons">
+                {% block back_invit %}
+                    <a href="{{ request.resource_url(context) }}" class="arrow-left">Retour</a>
+                {% endblock %}
+                <input id="button-mailto" type="button" value="Demander une invitation au dossier" class="button primary" disabled>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block optional %}
+    <div class="extra-button dossier box contact-admins">
+        <p class="contact">
+            Si votre dossier législatif ne figure pas dans la liste, veuillez
+            <a href="mailto:{{ request.registry.settings.get('zam.contact_mail') }}?subject={{ "Demande de dossier Signale" | urlencode }}" class="button primary">
+                contacter les administrateurs
+            </a>
+        </p>
+    </div>
+{% endblock %}
+
+
+{% block scripts %}
+    <script src="{{ request.static_url('zam_repondeur:static/js/dossiers.js') }}"></script>
+    <script src="{{ request.static_url('zam_repondeur:static/selectize/js/standalone/selectize.min.js') }}"></script>
+    <script src="{{ request.static_url('zam_repondeur:static/selectize/plugins/selectize-plugin-a11y.js') }}"></script>
+    <script src="{{ request.static_url('zam_repondeur:static/selectize/plugins/selectize_no_results.js') }}"></script>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", () => {
+            $("#select-dossier").selectize({
+                plugins: ['no_results', 'selectize-plugin-a11y'],
+                valueField: "mailto",
+                labelField: "titre",
+                searchField: ["titre"],
+                onInitialize: () => {
+                    $("#select-dossier-selectized").attr("spellcheck", "false")
+                },
+                onChange: (key) => {
+                    $("input[type=button]").prop("disabled", (key === ""));
+                },
+            })
+        })
+        document.addEventListener("DOMContentLoaded", () => {
+            $("#button-mailto").on( "click", function(event) {
+                var dossiers = document.getElementById("select-dossier");
+                var strMailto = dossiers.options[dossiers.selectedIndex].value;
+                if(strMailto.startsWith("mailto:")){
+                    window.location.replace(strMailto)
+                }
+            })
+        })
+    </script>
+{% endblock %}

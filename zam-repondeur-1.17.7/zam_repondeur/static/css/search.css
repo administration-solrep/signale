@@ -1,0 +1,101 @@
+.search-style {
+    display: flex;
+    justify-content: flex-end;
+}
+.search-style > .form-group{
+    display: flex;
+}
+
+#search-dossier.search-style,
+main.dossier-main div.pagination_signale {
+    margin: 0rem 0.5rem;
+}
+#search-dossier.search-style > .form-group{
+    width: 100% !important;
+}
+
+.search-button,
+.search-button:hover {
+    padding: 8px !important;
+    height: 38px !important;
+    border-radius: 0 5px 5px 0 !important;
+    overflow: hidden;
+}
+
+.search-style > .form-group label{
+    width: 180px;
+    display: inline-flex;
+    align-items: center;
+}
+
+div.quick-search div.selectize-input,
+div.quick-search div.dropdown-active {
+    border-radius: 5px 0 0 5px !important;
+    padding: 8px !important;
+    height: 38px !important;
+}
+
+/* PAGE DE RECHERCHE DEROULEUR */
+div#search {
+    margin-bottom: 7rem !important;
+}
+div#search div#search-body {
+    display: flex;
+    justify-content: space-evenly;
+}
+div#search form label {
+    display: block;
+    margin: 1rem auto 0;
+}
+div#search #search-contenu > *,
+div#search #search-reponse > * {
+	width: 100%;
+}
+div#search #search-contenu,
+div#search #search-reponse {
+    width: 30rem;
+    padding: 2rem;
+}
+form#search-derouleur div.save-button {
+    text-align: center;
+}
+form#search-derouleur #recherche-button,
+#redo_search,
+#export_results {
+    padding-left: 2.75rem;
+}
+div#search-body h4 {
+    font-weight: 600;
+}
+div#extra_search_buttons {
+    display: flex;
+    justify-content: space-between;
+    margin: 0.5rem 0 3rem;
+}
+label.exact-search {
+    display: inline-block !important;
+    margin: 0 5px !important;
+    padding-top: 5px;
+    font-size: small;
+}
+div.search-champs {
+    width: 100%;
+    display: flex;
+}
+input.exact-search {
+    margin: 0 0.5rem;
+    cursor: pointer;
+}
+#search-body input[type="text"] {
+    display: inline;
+}
+div.search-champs .options-search span {
+    height: min-content;
+    padding: 0.1rem 0;
+    font-size: 0.7rem;
+    font-style: italic;
+}
+div.options-search {
+    display: flex;
+    width: 6.5rem;
+}

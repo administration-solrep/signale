@@ -1,0 +1,248 @@
+{% extends "_base.html" %}
+{% import "macros.html" as macros %}
+
+{% block header %}
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/selectize/css/selectize.css') }}">
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/selectize/css/selectize.bootstrap3.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/pagination.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/dossier.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/search.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/news.css') }}">
+    <style type="text/css">
+        .dossier nav a {
+            background: no-repeat right center url("{{ request.static_url('zam_repondeur:static/img/big_right.svg') }}");
+        }
+        .main-titre .archives a {
+            background: no-repeat right center / 0.75rem url("{{ request.static_url('zam_repondeur:static/img/big_right.svg') }}");
+        }
+        a.link-previous {
+            background: no-repeat center / 0.75rem url("{{ request.static_url('zam_repondeur:static/img/big_left.svg') }}");
+        }
+        a.link-previous:hover {
+            background: no-repeat center / 0.75rem url("{{ request.static_url('zam_repondeur:static/img/big_left_white.svg') }}");
+        }
+        a.link-next {
+            background: no-repeat center / 0.75rem url("{{ request.static_url('zam_repondeur:static/img/big_right.svg') }}");
+        }
+        a.link-next:hover {
+            background: no-repeat center / 0.75rem url("{{ request.static_url('zam_repondeur:static/img/big_right_white.svg') }}");
+        }
+        .news a {
+            background: no-repeat left center / 1rem url("{{ request.static_url('zam_repondeur:static/img/paperclip.svg') }}");
+        }
+        #label_pj {
+            background: no-repeat 1rem center / 1rem url("{{ request.static_url('zam_repondeur:static/img/paperclip.svg') }}") #fff;
+        }
+        #label_pj:hover {
+            background: no-repeat 1rem center / 1rem url("{{ request.static_url('zam_repondeur:static/img/paperclip_white.svg') }}") #3167a6;
+        }
+    </style>
+{% endblock %}
+
+{% block main_class %}dossier-main{% endblock %}
+
+
+{% block pagination_block %}
+    {% if affichage_pagination_dossiers %}
+        {{ macros.pagination(request.resource_url(context),  pagination_data) }}
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <section>
+        <h2 class="main-titre">
+            {% block titre_dossiers %}
+                Dossiers législatifs
+            {% endblock %}
+            <span class="indications" title="Triés antéchronologiquement par date d'activation dans l'application">
+                <svg role="img" aria-label="Triés antéchronologiquement par date d'activation dans l'application" viewBox="0 0 16 16" class="bi bi-info-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z"/>
+                    <circle cx="8" cy="4.5" r="1"/>
+                </svg>
+            </span>
+            <div class="archives">
+                {% block link_dossiers %}
+                    <a href="{{ request.resource_url(context, 'archives') }}">
+                        Dossiers archivés
+                    </a>
+                {% endblock %}
+            </div>
+        </h2>
+
+        <div id="search-dossier" class="search-style">
+            <div class="form-group quick-search">
+                <label for="select-dossier">Recherche rapide : </label>
+
+                <select id="select-dossier" name="dossier" class="form-control " placeholder="{% if all_dossiers %}Intitulé du dossier législatif{% else %}Aucun dossier disponible pour la recherche…{% endif %}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                    <option value="" selected="selected"></option>
+                    {% for dossier in all_dossiers %}
+                       <option value="{{ dossier.slug }}">
+                        {% if request.user.is_admin %} {{ dossier.get_chambre }} {% endif %} {% if current_tab == "dossiers" %} {% if dossier.team.active %} [Activé] {% else %} [Archivé] {% endif %} {% endif %} {{ dossier.titre_semilong }}</option>
+                    {% endfor %}
+                </select>
+
+                <button value="Rechercher le dossier" name="submit-research" class="button enabled primary search-button">
+                    <svg role="img" aria-label="Rechercher le dossier" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <g id="icone/loupe" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            <path d="M14.9808264,13.4808264 L14.1908264,13.4808264 L13.9108264,13.2108264 C14.9247766,12.0348944 15.482018,10.5335368 15.4808264,8.98082641 C15.4808264,5.39097553 12.5706773,2.48082641 8.98082641,2.48082641 C5.39097553,2.48082641 2.48082641,5.39097553 2.48082641,8.98082641 C2.48082641,12.5706773 5.39097553,15.4808264 8.98082641,15.4808264 C10.5908264,15.4808264 12.0708264,14.8908264 13.2108264,13.9108264 L13.4808264,14.1908264 L13.4808264,14.9808264 L18.4808264,19.9708264 L19.9708264,18.4808264 L14.9808264,13.4808264 L14.9808264,13.4808264 Z M8.98082641,13.4808264 C6.49082641,13.4808264 4.48082641,11.4708264 4.48082641,8.98082641 C4.48082641,6.49082641 6.49082641,4.48082641 8.98082641,4.48082641 C11.4708264,4.48082641 13.4808264,6.49082641 13.4808264,8.98082641 C13.4808264,11.4708264 11.4708264,13.4808264 8.98082641,13.4808264 Z" id="Shape" fill="#FFFFFF"></path>
+                        </g>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        {% if request.user.is_admin %}
+            <p class="journal centered">
+                <a class="underlined" href="{{ request.resource_url(context, 'journal') }}">Journal</a>
+            </p>
+        {% endif %}
+
+        {{ self.pagination_block() }}
+
+        {% for dossier in dossiers[index_debut:index_fin] %}
+            <div class="dossier box relative">
+                <h3>{{ dossier.titre }}</h3>
+                <nav>
+                    <a href="{{ request.resource_url(context[dossier.url_key]) }}">
+                        Accéder à ce dossier
+                    </a>
+                </nav>
+                {% if dossier.team.active and dossier.alert_flag and request.user.is_admin %}
+                    {{ macros.alert_maj(dossier.pk, True, False, request, context[dossier.url_key], context) }}
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="dossier box">
+                {% block empty_message %}
+                    <h3>Vous ne participez à aucun dossier législatif pour l’instant.</h3>
+                {% endblock %}
+            </div>
+        {% endfor %}
+
+        {{ self.pagination_block() }}
+    </section>
+
+    {% block boutons_dossiers %}
+    {% endblock %}
+{% endblock %}
+
+{% block news %}
+    <div class="news {% if not actualite %}d-none{% endif %}">
+        {% if request.user.is_admin %}
+            <div class="edit-actualite d-none">
+                <form id="form-edit-actualite" action="{{ request.route_url('actualite') }}" method="POST" accept-charset="utf-8" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label id="label-message" for="message">Actualités</label>
+                        <textarea id="message" name="message" class="form-control editable">{% if actualite %}{{ actualite.message }}{% endif %}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label id="label_pj" for="piece_jointe" class="button primary">
+                            {% if actualite and actualite.has_attachment %}
+                                {{ actualite.file_name }}
+                            {% else %}
+                                Insérer une pièce jointe
+                            {% endif %}
+                        </label>
+                        <input id="piece_jointe" name="piece_jointe" type="file" value="" class="form-control" accept="application/pdf" />
+                        <input id="pj_changed" name="pj_changed" type="hidden" value="0" />
+                        <button id="delete-pj" name="delete-pj" type="button" class="button danger enabled {% if not actualite or not actualite.has_attachment %}d-none{% endif %}" title="Supprimer la pièce jointe">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16" style="vertical-align: sub;">
+                                <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"></path>
+                            </svg>
+                            <span>Supprimer</span>
+                        </button>
+                    </div>
+                    {% block news_back_url %}
+                    <input type="hidden" id="back" name="back" value="{{ request.resource_url(context) }}" />
+                    {% endblock %}
+                    <div class="buttons">
+                        <input type="submit" name="submit-form" value="Enregistrer" class="button primary enabled">
+                        <button id="cancel-actu" name="cancel-actu" type="button" class="button primary">Annuler</button>
+                        {% if actualite %}
+                            <button id="delete-actu-form" name="delete-actu-form" type="button" class="button enabled danger">Supprimer</button>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+
+        {% if actualite %}
+            <div id="message-actu">
+                {{ actualite.message|safe }}
+                {% if actualite.has_attachment %}
+                    <a href="{{ request.route_url('actualite_piece_jointe') }}">Ouvrir la pièce jointe</a>
+                {% endif %}
+
+                {% if request.user.is_admin %}
+                    <div class="buttons">
+                        <button id="modify-actu" type="button" class="button primary enabled">Modifier</button>
+                        <button id="delete-actu-msg" type="button" class="button enabled danger">Supprimer</button>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+    {% if request.user.is_admin and not actualite %}
+        <div id="open-form-actu">
+            <button id="button-open-actu" type="button" class="btn btn-secondary" title="Ajouter une actualité">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-arrow-bar-down" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M1 3.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5zM8 6a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 .708-.708L7.5 12.293V6.5A.5.5 0 0 1 8 6z"></path>
+                </svg>
+                <span>Cliquer pour ajouter une actualité</span>
+            </button>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ request.static_url('zam_repondeur:static/selectize/js/standalone/selectize.min.js') }}"></script>
+    <script src="{{ request.static_url('zam_repondeur:static/selectize/plugins/selectize-plugin-a11y.js') }}"></script>
+    <script src="{{ request.static_url('zam_repondeur:static/selectize/plugins/selectize_no_results.js') }}"></script>
+    <script src="{{ request.static_url('zam_repondeur:static/tinymce-5-8-2/tinymce.min.js') }}"></script>
+    <script src="{{ request.static_url('zam_repondeur:static/js/actualites.js') }}"></script>
+    <script type="text/javascript">
+        /* Liste déroulante recherche rapide */
+        document.addEventListener("DOMContentLoaded", () => {
+            $("#select-dossier").selectize({
+                plugins: ['no_results', 'selectize-plugin-a11y'],
+                valueField: "slug",
+                labelField: "dossier",
+                searchField: ["dossier"],
+                closeAfterSelect: true,
+                onInitialize: () => {
+                    $("#select-dossier-selectized").attr("spellcheck", "false")
+                },
+                onDropdownClose: function(){
+                    var selected = $(".item").html()
+                    if(selected){
+                        $("#search-dossier button").focus();
+                    }
+                }
+            })
+
+            $("#search-dossier button").on("click", () => {
+                href = "{{ request.resource_url(context) }}"
+                var input_key = $("#search-dossier select").val();
+                window.location.href = href + input_key;
+            })
+
+            $("#delete-actu-form").on("click", function(){
+                delete_actualite()
+            })
+            $("#delete-actu-msg").on("click", function(){
+                delete_actualite()
+            })
+        })
+
+        function delete_actualite(){
+            if(window.confirm(
+                'Êtes-vous sûr de vouloir supprimer le bandeau des actualités et sa pièce jointe ?'
+            )) {
+                back_url = "?back={{ request.resource_url(context) }}"
+                url_to_go = "{{ request.route_url('actualite', 'delete') }}"
+                window.location.href = url_to_go + back_url
+            }
+        }
+    </script>
+{% endblock %}

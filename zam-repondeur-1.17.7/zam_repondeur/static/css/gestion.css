@@ -1,0 +1,130 @@
+.notice {
+    margin: 3rem;
+}
+ul {
+    padding: 25px;
+    margin: 0px;
+}
+ul li {
+    list-style-type: none;
+    margin-top: .75rem;
+}
+ul li form {
+    margin-left: 2rem;
+}
+
+label[for="emails"] {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.bloc {
+    margin: 50px 0;
+}
+.bloc p {
+    text-align: justify;
+}
+.bloc.box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3rem;
+    margin-bottom: 3rem;
+}
+.bloc.box h4 {
+    font-weight: 600;
+    margin: 0 1rem 0 0;
+}
+
+/* Entete Tables */
+.bloc.list-bloc  {
+    position: relative;
+}
+.bloc.list-bloc a.export  {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.bloc.list-bloc details summary {
+    width: max-content;
+}
+
+/* Tables */
+.table {
+    background: white;
+    margin: 2rem auto;
+    text-align: center;
+    box-shadow: 0 0 10px #ccc;
+}
+.table th, .table td {
+    vertical-align: middle;
+    padding: 0 .75rem;
+}
+.table thead {
+    position: sticky;
+    top: 0;
+}
+.table thead th {
+    border: none;
+    font-weight: 600;
+    white-space: nowrap;
+    padding: .75rem;
+    background-color: #3167a6;
+    text-align: center;
+    color: #fff;
+}
+.table tr:hover {
+    background: #d4edda66;
+}
+.table tr th.radius-right {
+    border-radius: 0 5px 0 0;
+}
+.table tr th.radius-left {
+    border-radius: 5px 0 0 0;
+}
+
+.fixed-width {
+    width: 17rem;
+}
+
+.actions-buttons {
+    width: 20rem;
+    text-align: center;
+    margin: .5rem 0;
+}
+
+table.table caption {
+    caption-side: top;
+    text-align: justify;
+}
+
+/* Liste alimentation des données */
+table.table-urls tr td {
+    padding: 1rem;
+}
+table.table-urls tr td:first-child {
+    max-width: 25rem;
+}
+table.table-urls tr td a {
+    word-break: break-word;
+}
+table.table-urls td.bg-grey {
+    background-color: #ddd;
+}
+td.titre_lecture {
+    text-align: left;
+    font-weight: 600;
+    background-color: #3167a6;
+    color: #fff;
+}
+td.titre_lecture p {
+    font-weight: 500;
+    font-size: small;
+    font-style: italic;
+    margin: 0;
+}
+/* Liste rafraichissement étendu */
+table.table.table-urls td.maj-button {
+    width: 20rem;
+}

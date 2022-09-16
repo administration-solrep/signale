@@ -1,0 +1,55 @@
+{% extends "_base.html" %}
+{% import "macros.html" as macros %}
+
+{% block header %}
+<link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/manage.css') }}">
+{% endblock %}
+
+{% block body %}
+    <section id="admins_list_section">
+        <h2>Administrateurs</h2>
+
+        {% if last_event_datetime %}
+            <div class="last-update">
+                Dernière mise à jour :
+                <a class="underlined" href="{{ request.resource_url(context, 'journal') }}">
+                    <time datetime="{{ last_event_datetime.isoformat(timespec='milliseconds') }}"
+                        data-controller="timestamp"
+                        data-timestamp-modified-at="{{ last_event_timestamp }}">
+                            {{ last_event_datetime | human_readable_time }}
+                    </time>
+                </a>
+            </div>
+        {% endif %}
+
+        <ul>
+            {% for admin in admins %}
+                <li>
+                    {{ admin }}
+                    <form
+                        method="post"
+                        action="{{ request.resource_url(context) }}"
+                        data-controller="admin">
+                        <input type="hidden" name="user_pk" value="{{ admin.pk }}">
+                        <div class="form-group save-buttons del-buttons">
+                            <input
+                                type="submit" name="save" value="Retirer"
+                                class="button danger"
+                                data-action="admin#remove">
+                        </div>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+    <div id="admins_list_div" class="extra-button">
+        <a href="{{ request.resource_url(context.parent) }}" class="arrow-left">Retour</a>
+        <a class="button primary" href="{{ request.resource_url(context, 'add') }}">
+            Ajouter une personne
+        </a>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ request.static_url('zam_repondeur:static/js/admins.js') }}"></script>
+{% endblock %}

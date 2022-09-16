@@ -1,0 +1,97 @@
+.news {
+    background-color: #cbd9e9;
+    padding: 1rem;
+}
+    .news a {
+        display: block;
+        padding-left: 1.25rem;
+        width: max-content;
+    }
+    .news .buttons {
+        text-align: center;
+    }
+    .news .buttons .button {
+        margin: 0 1rem;
+    }
+    #label-message {
+        font-weight: 600;
+        margin: 2rem 0 1rem 0;
+        font-size: 1.2rem;
+    }
+    .news .edit-actualite {
+        width: 60rem;
+        margin: 0 auto;
+        padding: 0 2rem 2rem;
+    }
+#form-edit-actualite {
+    position: relative;
+}
+
+#message-actu {
+    text-align: justify;
+}
+
+#piece_jointe {
+    width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+#label_pj,
+#piece_jointe,
+#open-form-actu button {
+    cursor: pointer;
+}
+#piece_jointe:focus + label {
+	outline: 1px dotted #000;
+	outline: -webkit-focus-ring-color auto 5px;
+}
+#label_pj, #delete-pj {
+    padding-left: 2.5rem;
+}
+#delete-pj {
+    margin-left: -10px;
+    border-radius: 0 5px 5px 0;
+    width: 50px;
+    padding-left: 1rem;
+}
+    #delete-pj svg {
+        vertical-align: sub;
+    }
+#delete-actu-form {
+    margin: 0;
+    position: absolute;
+    top: 1rem;
+    right: 0;
+}
+
+/* Bouton pour ouvrir le formulaire lorsqu'il n'y a pas d'actualité */
+#open-form-actu {
+    text-align: center;
+}
+#open-form-actu button {
+    border: none;
+    background-color: #cbd9e9;
+    width: 4rem;
+    height: 2rem;
+    border-radius: 0 0 2rem 2rem;
+    color: #3167a6;
+    padding-top: 4px;
+}
+#open-form-actu span,
+#delete-pj span {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0,0,0,0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+#open-form-actu svg {
+    width: 22px;
+}

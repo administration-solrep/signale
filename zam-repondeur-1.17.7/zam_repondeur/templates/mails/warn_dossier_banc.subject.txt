@@ -1,0 +1,1 @@
+{{ badge }}{% if amendement.location.batch %}Sortie d’un lot d’amendements{% else %}Sortie d’un amendement{% endif %} de la corbeille « Dossier de banc »

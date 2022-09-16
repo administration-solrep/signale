@@ -1,0 +1,7 @@
+Bonjour,
+
+Le compte {{ user }} a été {% if is_grant %}passé en administrateur{% else %}supprimé de la liste des administrateurs{% endif %} par {{ admin or "l’équipe technique" }}.
+
+Bonne journée !
+
+Ce message est généré automatiquement. Merci de ne pas y répondre.

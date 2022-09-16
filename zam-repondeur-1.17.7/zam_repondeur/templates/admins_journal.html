@@ -1,0 +1,15 @@
+{% extends "_base.html" %}
+{% import "macros.html" as macros with context %}
+
+{% block main_class %}box{% endblock %}
+
+{% block header %}
+<link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/journal.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/manage.css') }}">
+{% endblock %}
+
+{% block body %}
+    <a href="{{ request.resource_url(context) }}" class="arrow-left">Retour à la liste des administrateurs</a>
+    <h2>Journal</h2>
+    {{ macros.timeline(events, today) }}
+{% endblock %}

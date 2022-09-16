@@ -1,0 +1,50 @@
+{% extends "_base_dossier.html" %}
+{% import "macros.html" as macros %}
+
+{% block header %}
+    <link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/dossier.css') }}">
+{% endblock %}
+
+{% block main_class %}box{% endblock %}
+
+{% block body %}
+    {{ macros.msg_readonly(dossier.team.active, 0) }}
+
+    <h1>{{ dossier.titre }}</h1>
+    <p>
+        <big>
+            Renseigner ici les adresses courriel des personnes à inviter sur l’ensemble de l’espace de travail relatif à ce dossier législatif.
+        </big>
+    </p>
+    <form
+        method="post"
+        action="{{ request.resource_url(context, 'invite_contributeur') }}"
+        data-controller="dossier-invite">
+        <input type="hidden" name="origin" value="invite">
+        <div class="form-group">
+            <label for="emails">
+                Transmettre une invitation à :
+                <small>Passer à la ligne entre chaque adresse courriel.</small>
+            </label>
+            <textarea
+                name="emails" class="form-control" rows="10"
+                data-action="paste->dossier-invite#clean"></textarea>
+        </div>
+        <div class="form-group save-buttons">
+            <a href="{{ request.resource_url(context) }}" class="arrow-left">Retour</a>
+            <input type="submit" name="save" value="Inviter en tant que Contributeur" class="button primary enabled">              
+        </div>
+    </form>
+    <details>
+        <summary>Invitations déjà transmises</summary>
+        <ul>
+        {% for user in team.users %}
+            <li>{{ user }}</li>
+        {% endfor %}
+        </ul>
+    </details>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ request.static_url('zam_repondeur:static/js/dossiers.js') }}"></script>
+{% endblock %}

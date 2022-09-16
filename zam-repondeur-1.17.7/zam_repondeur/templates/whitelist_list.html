@@ -1,0 +1,55 @@
+{% extends "_base.html" %}
+{% import "macros.html" as macros %}
+
+{% block header %}
+    <link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/manage.css') }}">
+{% endblock %}
+
+{% block body %}
+    <section id="whitelist">
+        <h2>Adresses autorisées</h2>
+
+        {% if last_event_datetime %}
+            <div class="last-update">
+                Dernière mise à jour :
+                <a class="underlined" href="{{ request.resource_url(context, 'journal') }}">
+                    <time datetime="{{ last_event_datetime.isoformat(timespec='milliseconds') }}"
+                        data-controller="timestamp"
+                        data-timestamp-modified-at="{{ last_event_timestamp }}">
+                            {{ last_event_datetime | human_readable_time }}
+                    </time>
+                </a>
+            </div>
+        {% endif %}
+
+        <ul>
+            {% for email_pattern in email_patterns %}
+                <li>
+                    {{ email_pattern }}
+                    <form
+                        method="post"
+                        action="{{ request.resource_url(context) }}"
+                        data-controller="email-pattern">
+                        <input type="hidden" name="pk" value="{{ email_pattern.pk }}">
+                        <div class="form-group save-buttons del-buttons">
+                            <input
+                                type="submit" name="save" value="Supprimer"
+                                class="button danger"
+                                data-action="email-pattern#delete">
+                        </div>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+    <div class="extra-button">
+        <a href="{{ request.resource_url(context.parent) }}" class="arrow-left">Retour</a>
+        <a class="button primary" href="{{ request.resource_url(context, 'add') }}">
+            Ajouter une adresse
+        </a>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ request.static_url('zam_repondeur:static/js/whitelist.js') }}"></script>
+{% endblock %}

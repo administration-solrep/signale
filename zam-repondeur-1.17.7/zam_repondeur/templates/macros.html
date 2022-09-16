@@ -1,0 +1,278 @@
+{% macro status(amendement) %}
+    {% if amendement.is_abandoned_before_seance %}
+        {% if amendement.is_withdrawn %}
+            <span class="status grey">Retiré</span>
+        {% elif amendement.is_irrecevable %}
+            <span class="status grey">Irrecevable</span>
+        {% endif %}
+    {% elif amendement.gouvernemental %}
+        <span class="status blue">Gouvernemental</span>
+    {% endif %}
+{% endmacro %}
+
+{% macro user_activity(user) %}
+    {% if user.is_active %}
+        <div class="user active" title="Activité dans les {{ user.INACTIVE_AFTER }} dernières minutes"><span class="activity"></span> {{ user.name }} <span class="email">({{ user.email }})</span></div>
+    {% else %}
+        <div class="user inactive" title="Inactivité dans les {{ user.INACTIVE_AFTER }} dernières minutes"><span class="activity"></span> {{ user.name }} <span class="email">({{ user.email }})</span></div>
+    {% endif %}
+{% endmacro %}
+
+{% macro timeline(events, today) %}
+    <div class="container timeline">
+        {% for key, events in events|group_by_day %}
+            <h3>
+                {% if key == today %}
+                    Aujourd’hui
+                {% else %}
+                    {{ key | human_readable_day_of_month }}
+                {% endif %}
+            </h3>
+            <ul>
+            {% set outer_loop = loop %}
+            {% for event in events %}
+                {{ journal_line(outer_loop.first and loop.first, event) }}
+            {% endfor %}
+            </ul>
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+{% macro journal_line(is_first, event) %}
+    <li>
+        <em class="when">
+            <time title="{{ event.created_at | human_readable_date_and_time }}"
+                datetime="{{ event.created_at.isoformat(timespec='milliseconds') }}"
+                >
+                    {{ event.created_at | human_readable_time }}
+            </time>
+        </em>
+        <span class="icon">
+            {% if event.icon %}
+                <i class="icon-{{ event.icon }}"></i>
+            {% endif %}
+        </span>
+        <div class="what">
+            {% set details = event.render_details() %}
+            {# Utilisation de set pour modifier l'objet event à la volée  et générer le lien nécessaire #}
+            {% set link = event.set_amdt_link( request ) %}
+            {% if details %}
+                <details {% if is_first %}open{% endif %}>
+                    <summary>{{ event.render_summary() }}</summary>
+                    <p>{{ details }}</p>
+                </details>
+            {% else %}
+                <p>{{ event.render_summary() }}</p>
+            {% endif %}
+        </div>
+    </li>
+{% endmacro %}
+
+{% macro svg_icon(name, class="") %}
+    <svg class="icon {{ class }}" aria-hidden="true">
+        <use xlink:href="#{{ name }}"></use>
+    </svg>
+{% endmacro %}
+
+{% macro numero_amendement(amendement) %}
+    {% if amendement.location.batch %}
+        N<sup>os</sup>&nbsp;
+        {%- for amdt in amendement.location.batch.amendements[:-1] -%}
+            {{ link_amendement(amdt) }}
+            {%- if not loop.last %}, {% endif %}
+        {%- endfor %}
+        et {{ link_amendement(amendement.location.batch.amendements[-1]) }}
+    {% else %}
+        Nº&nbsp;{{ link_amendement(amendement) }}
+    {% endif %}
+{% endmacro %}
+
+{% macro link_amendement(amendement) -%}
+    <a href="{{ request.resource_url(context['amendements'][amendement.num_str], 'amendement_edit') }}">{{ amendement }}</a>
+{%- endmacro %}
+
+{% macro pagination(path_url, pagination_data) -%}
+<div class="pagination_signale">
+    <ul>
+        {% if pagination_data.get('previous') %}
+            <li class="previous">
+                <a href="{{ path_url }}?{{ pagination_data.previous.param }}={{ pagination_data.previous.value | urlencode }}" title="{{ pagination_data.previous.title }}" class="link-previous">
+                    <span>
+                        {{ pagination_data.previous.title }}
+                    </span>
+                </a>
+            </li>
+        {% endif %}
+
+        {% if pagination_data.get('first') %}
+            <li>
+                {{ link_pagination( path_url, pagination_data.first ) }}
+            </li>
+        {% endif %}
+
+        {% if pagination_data.get('first_elipse') %}
+            <li class="ellipsis">...</li>
+        {% endif %}
+
+        {% for page in pagination_data.pages %}
+            {% if page.current %}
+                <li class="paginate-active"><span>{{ page.label }}</span></li>
+            {% else %}
+                <li>{{ link_pagination( path_url, page ) }}</li>
+            {% endif %}
+        {% endfor %}
+
+        {% if pagination_data.get('last_elipse') %}
+            <li class="ellipsis">...</li>
+        {% endif %}
+
+        {% if pagination_data.get('last') %}
+            <li>
+                {{ link_pagination( path_url, pagination_data.last ) }}
+            </li>
+        {% endif %}
+
+        {% if pagination_data.get('next') %}
+            <li class="next">
+                <a href="{{ path_url }}?{{ pagination_data.next.param }}={{ pagination_data.next.value | urlencode }}" title="{{ pagination_data.next.title }}" class="link-next">
+                    <span>
+                        {{ pagination_data.next.title }}
+                    </span>
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+</div>
+{%- endmacro %}
+
+{% macro link_pagination(path_url, data) -%}
+   <a href="{{ path_url }}?{{ data.param }}={{ data.value | urlencode }}">{{ data.label }}</a>
+{%- endmacro %}
+
+{% macro msg_readonly(isActive, isBatch) -%}
+    {% if not isActive %}
+        <div class="readonly-message {% if not isBatch %}marged{% endif %}">
+            <p>Ce dossier est en lecture seule.</p>
+        </div>
+    {% endif %}
+{%- endmacro %}
+
+{% macro list_amdts(amendements, default_amdt, phrase, type, toBatch) -%}
+    {% if not toBatch %}
+    <div class="form-group {{ type }}">
+        {% if phrase %}Veuillez choisir {{ phrase }} pour l'ensemble des amendements sélectionnés :{% endif %}
+        <select name="amendement-{{ type }}" class="form-control select-amdt select-{{ type }}" placeholder="Numéro de l'amendement" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <option value="0" {%if not default_amdt %}selected{% endif %}>Réponse vierge</option>
+            {% for amendement in amendements %}
+                <option value="{{ amendement.num }}" {%if default_amdt and default_amdt.num == amendement.num %}selected{% endif %}>{{ amendement }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    {% endif %}
+{%- endmacro %}
+
+{% macro form_reponse(amendements, avis, toBatch) -%}
+    <div class="same-reponse">
+        <h4>Configuration de la réponse commune</h4>
+        <p>Veuillez choisir une réponse pour l'ensemble des amendements {% if toBatch %}de ce lot{% else %}sélectionnés{% endif %}.<br>
+            Attention, les informations sélectionnées ou saisies sur cette page seront appliquées sur l'ensemble des
+            amendements {% if toBatch %}du lot{% else %}sélectionnés{% endif %} et écraseront les données déjà présentes.</p>
+
+        {{ list_amdts(amendements, default_amdt, "", "global", False) }}
+
+        {% for amendement in amendements %}
+            <input type="hidden" id="{{ amendement.num }}-avis" name="{{ amendement.num }}-avis" value="{{ amendement.user_content.avis or '' }}">
+            <input type="hidden" id="{{ amendement.num }}-objet" name="{{ amendement.num }}-objet" value="{{ amendement.user_content.objet or '' }}">
+            <input type="hidden" id="{{ amendement.num }}-reponse" name="{{ amendement.num }}-reponse" value="{{ amendement.user_content.reponse or '' }}">
+            <input type="hidden" id="{{ amendement.num }}-comments" name="{{ amendement.num }}-comments" value="{{ amendement.user_content.comments or '' }}">
+            <input type="hidden" id="{{ amendement.num }}-gouv" name="{{ amendement.num }}-gouv" value="{{ amendement.gouvernemental }}">
+        {% endfor %}
+
+        <div class="box" {% if not toBatch %}data-controller="switch-copy" data-action="unload@window->switch-copy#unload"{% endif %}>
+            <div class="form-group">
+                {{ switch("avis", "l'avis", toBatch) }}
+                <label for="avis">
+                    {% if toBatch %}P{% else %} Copier la p{% endif %}osition du gouvernement
+                </label>
+                <div data-target="switch-copy.avis">
+                    {{ list_amdts(amendements, default_amdt, "une position du gouvernement", "avis", toBatch) }}
+                    <select id="avis" name="avis" class="form-control" data-action="unsaved-changes#setDirty">
+                        <option value="">Choisir dans la liste…</option>
+                        {% for value in avis %}
+                            <option value="{{ value }}" {%if default_amdt and default_amdt.user_content.avis == value %}selected{% endif %}>{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                {{ switch("objet", "l'objet", toBatch) }}
+                <label for="objet">
+                    {% if toBatch %}O{% else %} Copier l'o{% endif %}bjet des amendements
+                </label>
+                <div data-target="switch-copy.objet">
+                    {{ list_amdts(amendements, default_amdt, "ou saisir un objet", "objet", toBatch) }}
+                    <textarea id="objet" name="objet" class="form-control editable">
+                        {%if default_amdt %}
+                            {{ default_amdt.user_content.objet or "" }}
+                        {% endif %}
+                    </textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                {{ switch("reponse", "la réponse", toBatch) }}
+                <label for="reponse">
+                    {% if toBatch %}R{% else %} Copier la r{% endif %}éponse aux amendements
+                </label>
+                <div data-target="switch-copy.reponse">
+                    {{ list_amdts(amendements, default_amdt, "ou saisir une réponse", "reponse", toBatch) }}
+                    <textarea id="reponse" name="reponse" class="form-control editable">
+                        {%if default_amdt %}
+                            {{ default_amdt.user_content.reponse or "" }}
+                        {% endif %}
+                    </textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                {{ switch("comments", "les commentaires", toBatch) }}
+                <label for="comments">
+                    {% if toBatch %}C{% else %} Copier les c{% endif %}ommentaires
+                    <small>(n’apparaissent pas dans le dossier de banc)</small>
+                </label>
+                <div data-target="switch-copy.comments">
+                    {{ list_amdts(amendements, default_amdt, "ou saisir un commentaire", "comments", toBatch) }}
+                    <textarea id="comments" name="comments" class="form-control" data-action="keydown->unsaved-changes#setDirty">{% if default_amdt %}{{ comments | safe }}{% endif %}</textarea>
+                </div>
+            </div>
+
+            <input type="hidden" id="same-reponse" name="same-reponse" value="1">
+        </div>
+    </div>
+{%- endmacro %}
+
+{% macro switch(element, title, toBatch) -%}
+    {% if not toBatch %}
+        <label class="switch" title="Activer ou désactiver la copie pour {{ title }}">
+            <input id="switch-{{ element }}" name="switch-{{ element }}" type="checkbox" checked
+                   data-action="click->switch-copy#doSwitch"
+                   data-target="switch-copy.input{{ element }}">
+            <span class="slider"></span>
+        </label>
+    {% endif %}
+{%- endmacro %}
+
+{% macro alert_maj(pk, is_dossier, is_big, request, context, back_context) -%}
+    <form class="alert-form {{ 'alert-big' if is_big else '' }}" name="alert-form" method="post" action="{{ request.resource_url(context, 'disable_alert') }}">
+        <input type="hidden" name="is_dossier" value="{{ is_dossier|int }}">
+        <input type="hidden" name="pk" value="{{ pk }}">
+        <input type="hidden" name="back_url" value="{{ request.resource_url(back_context) }}">
+        <button class="alert-maj" type="submit" name="alert-maj">
+            {{ "Dossier" if is_dossier else "Lecture" }} en erreur, cliquer pour supprimer l'alerte
+            <svg role="img" aria-label="Alerte mise à jour" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation alert-svg" viewBox="0 0 16 16">
+                <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.553.553 0 0 1-1.1 0L7.1 4.995z"></path>
+            </svg>
+        </button>
+    </form>
+{%- endmacro %}

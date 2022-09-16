@@ -1,0 +1,1 @@
+{{ badge }}{% if is_grant %}Création{% else %}Suppression{% endif %} d’un compte administrateur

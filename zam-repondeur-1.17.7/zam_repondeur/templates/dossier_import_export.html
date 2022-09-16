@@ -1,0 +1,81 @@
+{% extends "_base_dossier.html" %}
+{% import "macros.html" as macros %}
+
+{% block header %}
+    <link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/import_export.css') }}">
+    <style>
+	    input[type="submit"].zip-icon {
+	        background: no-repeat 3rem / .8rem url("{{ request.static_url('zam_repondeur:static/img/archive-icon-blue.svg') }}") #fff;
+	    }
+	    input[type="submit"].zip-icon:hover {
+	        background: no-repeat 3rem / .8rem url("{{ request.static_url('zam_repondeur:static/img/archive-icon-white.svg') }}") #3167A6;
+	    }
+	    button.download {
+	        background: no-repeat 3rem / 2.5rem url("{{ request.static_url('zam_repondeur:static/img/arrow_down.svg') }}") #3167A6;
+	    }
+	    button.download:hover {
+	        background: no-repeat 3rem / 2.5rem url("{{ request.static_url('zam_repondeur:static/img/arrow_down_blue.svg') }}") #fff;
+	    }
+    </style>
+{% endblock %}
+
+{% block main_class %}box{% endblock %}
+
+{% block body %}
+{{ macros.msg_readonly(active, 0) }}
+
+<h1>Export {{ "/ Import" if dossier.team.active and request.user.is_admin else "de données" }} du dossier complet</h1>
+
+<div class="last-update">
+    <a class="underlined" href="{{ request.resource_url(context, 'journal') }}">Journal</a>
+</div>
+
+<div class="box" data-controller="multiple-clicks">
+    <div class="flex-line">
+        <div>
+            <h3>Export global</h3>
+            <p>au format ZIP.</p>
+        </div>
+        <form id="export-global" name="export-global" method="post" action="{{ request.resource_url(context, 'export_dossier') }}">
+            <input id="export" type="submit" value="Dossier complet" class="button primary zip-icon" data-action="multiple-clicks#prevent" />
+        </form>
+    </div>
+    {% if expire_file %}
+    <form id="download_zip" action="{{ request.resource_url(dossier_resource, 'download_export') }}">
+        <button class="button primary enabled download" type="submit">
+            <b>Télécharger le fichier</b>
+            <span>(expire le {{ expire_file.strftime('%d/%m/%Y à %H:%M:%S') }})</span>
+        </button>
+    </form>
+    {% endif %}
+</div>
+
+{% if active and request.user.is_admin %}
+    <div class="box">
+        <section data-target="amendements-options.details">
+            <div class="flex-line" data-controller="filename">
+                <div>
+                    <h3>Import global</h3>
+                    <p>au format ZIP (fichiers JSON uniquement).</p>
+                </div>
+                <form action="{{ request.resource_url(context) }}" enctype="multipart/form-data" method="post" id="backup-form">
+                    <div class="custom-file">
+                        <input type="file" data-action="filename#display" class="custom-file-input" id="backup" name="backup" required accept=".zip">
+                        <label class="custom-file-label" for="backup">Fichier ZIP</label>
+                    </div>
+                    <div role="group">
+                        <input type="submit"
+                               name="upload"
+                               class="button primary enabled centered "
+                               value="Importer">
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ request.static_url('zam_repondeur:static/js/dossiers.js') }}"></script>
+{% endblock %}

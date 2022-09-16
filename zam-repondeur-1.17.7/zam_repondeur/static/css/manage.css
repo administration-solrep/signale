@@ -1,0 +1,36 @@
+h2 {
+    text-align: center;
+    margin: 2.5rem 0 1.5rem 0;
+    font-weight: 600;
+}
+.form-group:not(.del-buttons) {
+    margin: 5rem 0 3rem;
+    font-size: 1.5rem;
+}
+    .form-group:not(.del-buttons) input {
+        margin-left: 1rem;
+    }
+    form#add-whitelist .form-group {
+        text-align: center;
+    }
+
+section .save-buttons {
+    justify-content: left;
+}
+.extra-button {
+    text-align: center;
+    margin-top: 2rem;
+    display: flex;
+    justify-content: space-around;
+    align-items: baseline;
+}
+.box section ul {
+    margin: 3rem;
+}
+    .box section ul li {
+        display: flex;
+        align-items: baseline;
+    }
+        .box ul li form {
+            margin-left: 1rem;
+        }

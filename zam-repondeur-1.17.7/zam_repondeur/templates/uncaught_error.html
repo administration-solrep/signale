@@ -1,0 +1,35 @@
+ <!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body {
+                background-color: #3167a6;
+                margin-left: "auto";
+                margin-right: "auto";
+                text-align: center;
+                color: #ffffff;
+                font-family: "source_sans_pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            }
+            h1 {
+                color: #ffffff;
+                text-align: center;
+            }
+            p {
+                font-size: 2em;
+            }
+            div {
+                margin-top: 100px;
+            }
+            a {
+                color: #ffffff;
+            }
+            </style>
+    </head>
+    <body>
+        <div>
+            <h1>SIGNALE a rencontré une erreur inconnue</h1>
+            <p>Code de l'erreur : {{ code }}</p>
+            <p>Merci de contacter <a href="mailto:{{ request.registry.settings.get('zam.contact_mail') }}?body=Une erreur inconnue a été rencontrée - code: {{ code }}&subject=[SIGNALE] - Erreur dans l'application - {{code}}">l'équipe technique de la DILA</a></p>
+        </div>
+    </body>
+</html>

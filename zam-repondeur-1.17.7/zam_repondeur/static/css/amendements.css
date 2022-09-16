@@ -1,0 +1,422 @@
+h2.subtitle {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 1.5rem;
+}
+p.subtitle {
+    font-style: italic;
+    font-size: 1.1rem;
+    text-align: center;
+    font-weight: normal;
+    margin-bottom: 1.5rem;
+}
+
+.content {
+    margin-top: 30px;
+}
+.content .notice {
+    margin-top: 2rem;
+}
+.content h3.titre-article {
+    text-align: center;
+    margin: 40px auto;
+}
+.content {
+    margin: 0 1rem;
+    margin-top:20px;
+    display:block;
+}
+.content .nb-amdts,
+.content .option span {
+    float: right;
+}
+
+.box-large .content {
+    margin: 20px 0 0 0;
+}
+
+.relative {
+    position: relative;
+}
+
+.svg-position {
+    position: absolute;
+    width: 0;
+    height: 0;
+}
+
+/* Recherche rapide dérouleur et page recherche */
+.search-style{
+    margin-top: 50px;
+}
+.search-style > .form-group label{
+    width: 140px !important;
+}
+div.quick-search div.selectize-control,
+div.quick-search div.selectize-input {
+    width: 300px !important;
+}
+div.quick-search div.selectize-control.single div.item {
+    max-width: 13rem;
+}
+div.optgroup-header {
+    font-weight: 666;
+    font-size: medium !important;
+    color: #3167a6 !important;
+}
+
+/* Articles */
+#bottom-nav {
+    margin-top: 5rem;
+    margin-bottom: 3rem;
+}
+#articles ul {
+    column-width: 12rem;
+     margin-bottom: 3rem;
+}
+#articles li {
+    margin-bottom: 0.75rem;
+}
+
+
+/* Table formatting */
+.table {
+    background: white;
+    max-width: 55rem;
+    margin: 0 auto;
+}
+.box-large table {
+    max-width: 74rem;
+}
+.table th, .table td {
+    vertical-align: middle;
+    padding: .45rem .75rem .4rem;
+}
+.table td > span,
+.table td a {
+    display: inline-block;
+    line-height: 1;
+}
+.table thead th {
+    border: none;
+    font-weight: 600;
+    white-space: nowrap;
+    padding: .75rem;
+}
+.table tbody tr:first-child td {
+    padding-top: 1rem;
+}
+.table tbody tr:hover {
+    background: #d4edda66;
+}
+
+/* Filtering */
+tr[data-retire-avant-seance="1"] {
+    background-color: #d9d9d9;
+}
+
+td.identique, td.discussion_commune {
+    position: relative;
+}
+
+td.identique:after {
+    content: "";
+    background-color: lightblue;
+    position: absolute;
+    width: 6px;
+    top: 0;
+    right: 0;
+    height: calc(100% + 1px);  /* extra pixel to cover tr bottom border */
+}
+
+td.discussion_commune:before {
+    content: "";
+    background-color: lightcoral;
+    position: absolute;
+    width: 6px;
+    top: 0;
+    right: 10px;
+    height: calc(100% + 1px);  /* extra pixel to cover tr bottom border */
+}
+
+
+td.identique.first:after, td.discussion_commune.first_c:before {
+    bottom: -1px;  /* move down 1 pixel to cover tr bottom border */
+    top: inherit;
+    height: calc(100% - 4px);
+    border-radius: 6px 6px 0 0;
+}
+
+td.identique.last:after, td.discussion_commune.last_c:before {
+    height: calc(100% - 5px);
+    border-radius: 0 0 6px 6px;
+}
+td.identique.first.last:after, td.discussion_commune.first_c.last_c:before {
+    top: 5px;
+    height: calc(100% - 10px);
+    border-radius: 6px;
+}
+
+table.filtered-amendement td.identique:after,
+table.filtered-amendement td.identique.first.last:after,
+table.filtered-emptytable td.identique:after,
+table.filtered-emptytable td.identique.first.last:after,
+table.filtered-status td.identique:after,
+table.filtered-status td.identique.first.last:after,
+table.filtered-amendement td.discussion_commune:before,
+table.filtered-amendement td.discussion_commune.first_c.last_c:before,
+table.filtered-emptytable td.discussion_commune:before,
+table.filtered-emptytable td.discussion_commune.first_c.last_c:before,
+table.filtered-status td.discussion_commune:before,
+table.filtered-status td.discussion_commune.first_c.last_c:before {
+    top: calc(50% - 3px);
+    height: 6px;
+    border-radius: 6px;
+}
+
+/* Links in table */
+td a, td a:hover {
+    white-space: nowrap;
+    text-decoration: none;
+}
+td a.arrow-right {
+    padding-right: .8rem;
+    background: no-repeat right 35%/18% url("../img/big_right.svg");
+}
+
+:target {
+    background: #ededed66;
+}
+/* To keep under :target for priority. */
+.highlighted {
+    background: #d4edda66;
+}
+div.nowrap {
+    display: block;
+    white-space: nowrap;
+}
+span.avis {
+    width: 6px;
+    display: block;
+    height: 1.5rem;
+    float: left;
+    margin: 0 0.5rem 0 0;
+}
+span.avis.positive {
+    background-color: #b8e986;
+}
+span.avis.sagesse {
+    background-color: #6db4ff;
+}
+span.avis.negative {
+    background-color: #d0021b;
+}
+span.avis.gouvernement {
+    background-color: #3167a6;
+}
+span.avis.abandoned_before_seance {
+    background-color: #979797;
+}
+
+td form {
+    display: inline-block;
+}
+tr.limit-derouleur {
+    text-align: center;
+    background-color: #ffc107;
+    font-style: italic;
+}
+
+.button-sm {
+    font-size: .9rem;
+    min-width: 1rem;
+    padding: 0.4rem 1rem 0.2rem 1rem;
+}
+.button-sm.enabled:hover {
+    font-size: .9rem;
+    min-width: 1rem;
+    padding: 0.4rem 1rem 0.2rem 1rem;
+}
+#amendement-help.box.notice {
+    visibility: visible;
+    opacity: 1;
+    transition: visibility 0s, opacity 0.5s linear, height 0.5s linear;
+    margin-top: 1rem;
+    margin-bottom: 0;
+}
+#amendement-help.box.notice.v-hidden,
+.v-hidden {
+    display: none;
+    opacity: 0;
+    height: 0;
+}
+img.warning-icon {
+   width: 25px;
+}
+.page-pos {
+    margin-top:30px;
+}
+.pagination_signale {
+    background-color: #f2f2f2;
+    text-align: center;
+    width: 100%;
+}
+
+#switch-pagination {
+    margin-top: 10px;
+}
+.float-left {
+    float: left;
+}
+.position_banc_0 {
+}
+.position_banc_1 {
+    color: #d0021b;
+}
+.position_banc_2 {
+    color: #3167a6;
+}
+td.column-dossierbanc img {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+}
+
+abbr.selected.danger {
+    color: #fff;
+    background-color: #d0021b;
+    border: 1px solid #d0021b;
+}
+abbr.selected.success {
+    color: #fff;
+    background-color: #62B600;
+    border: 1px solid #62B600;
+}
+
+.extra-button.lecture {
+    margin: 3rem 0;
+    justify-content: center;
+    display: flex;
+}
+
+div#popin-objet {
+    top: 50%;
+    transform: perspective(1px) translateY(-50%);
+    position: fixed;
+    z-index: 10;
+    max-width: 50rem;
+    max-height: 28rem;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+}
+div#popin-objet div#content-popin {
+    max-height: 25rem;
+}
+div#popin-objet div#content-objet {
+    max-height: 22.5rem;
+    overflow: auto;
+}
+div#overlay-screen {
+    background-color: rgba(220, 220, 230, 0.4);
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 10;
+}
+div#content-objet table th,
+div#content-objet table td {
+	border: 1px solid black;
+	padding: 0.5rem;
+}
+
+/* Spinner loading objet */
+#loading-objet {
+    text-align: center;
+}
+#loading-objet #loading {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(0,0,0,.1);
+  border-radius: 50%;
+  border-top-color: #3167a6;
+  animation: spin 1s ease-in-out infinite;
+  -webkit-animation: spin 1s ease-in-out infinite;
+  margin: 1rem auto;
+}
+
+@keyframes spin {
+  to { -webkit-transform: rotate(360deg); }
+}
+@-webkit-keyframes spin {
+  to { -webkit-transform: rotate(360deg); }
+}
+button.objet-file {
+    width: 20px;
+    height: 25px;
+    overflow: hidden;
+    margin: 0;
+    border: none;
+    display: ruby;
+}
+button.objet-file span {
+    margin-left: 2rem;
+    visibility: hidden;
+}
+.selectize-control.multi .selectize-input > div.active {
+  background: #3167a6 !important;
+}
+
+tr.groupActions th a {
+    margin: 0 0.5rem;
+}
+tr.groupActions th form {
+    display: inline;
+}
+
+td.fix-column-width {
+    max-width: 6rem;
+    word-wrap: anywhere;
+}
+
+a#trinum {
+    width: 30px;
+    height: 20px;
+    display: inline-block;
+    text-align: center;
+    vertical-align: sub;
+    overflow: hidden;
+}
+a#trinum svg {
+    width: 15px;
+    height: 18px;
+    padding-top: 3px;
+}
+a#trinum path.grey {
+    fill: #ccc;
+}
+a#trinum path.black {
+    fill: #000;
+}
+
+/* Alerte flag lecture */
+form.alert-form.alert-big {
+    top: 1rem;
+    right: 1rem;
+}
+form.alert-form.alert-big .alert-maj {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 2rem;
+    font-size: 18px;
+}
+form.alert-form.alert-big svg.alert-svg {
+    width: 2.5rem;
+    height: 2.5rem;
+}
+form.alert-form.alert-big .alert-maj:hover {
+    width: 26rem;
+}

@@ -1,0 +1,377 @@
+h1 {
+    margin-bottom: 2rem;
+}
+.box {
+    margin: 1rem 0;
+    position: relative;
+}
+    main.box {
+        position: relative;
+        z-index: 0;
+    }
+    .box.amendement-card {
+        box-shadow: none;
+    }
+.options {
+    margin-left: 3rem;
+    margin-right: 3rem;
+}
+.table {
+    margin-left: 3rem;
+    margin-right: 3rem;
+    width: calc(100% - 6rem);
+}
+.amendement-checkbox {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    transform: scale(1.5);
+}
+.notice {
+    margin: 3rem;
+}
+    .notice h3 {
+        margin: 1rem 0 2rem 0;
+    }
+    .notice nav {
+        padding: 0 1rem;
+        text-align: right;
+    }
+        .notice nav a {
+            font-size: 1.4rem;
+            padding-right: 2rem;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-position: right 33%;
+            background-size: 0.9rem;
+        }
+.amendement-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+}
+    .amendement-card p {
+        margin: 1rem 2rem 1rem 0;
+    }
+    .amendement-card-infos {
+        flex-basis: 40rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+        .amendement-card-infos .article {
+            font-style: italic;
+        }
+            .amendement-card-infos a.article {
+                text-decoration: underline;
+            }
+        .amendement-card-infos .numero {
+            font-weight: 600;
+        }
+        .amendement-card-infos .auteur {
+            font-style: italic;
+        }
+    .amendement-card-avis {
+        flex-basis: 18rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        white-space: nowrap;
+    }
+        .amendement-card-avis p {
+            margin: 1rem 1rem 0 0;
+            text-align: center;
+        }
+
+        .amendement-card-avis .button {
+            margin: 0.5rem auto;
+        }
+        .amendement-card-avis .icon.favorable {
+            color: #83d524;
+        }
+        .amendement-card-avis .icon.sagesse {
+            color: #6db4ff;
+        }
+        .amendement-card-avis .icon.defavorable {
+            color: #d0021b;
+        }
+        .amendement-card-avis .avis {
+            text-align: center;
+        }
+        .amendement-card-avis .avis p {
+            color: inherit;
+            font-weight: 600;
+        }
+.amendement-batch {
+    position: relative;
+}
+    .amendement-batch,
+    .amendement-batch:before,
+    .amendement-batch:after,
+    .amendement-card {
+        background-color: #fff;
+        border: 1px solid #ccc;
+    }
+    .amendement-batch:before,
+    .amendement-batch:after {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        -webkit-transform: rotateZ(0.5deg);
+        -o-transform: rotate(0.5deg);
+        transform: rotateZ(0.5deg);
+        z-index: -1;
+        left: 11px;
+        top: 11px;
+    }
+    .amendement-batch:after {
+        -webkit-transform: rotateZ(0.25deg);
+        -o-transform: rotate(0.25deg);
+        transform: rotateZ(0.25deg);
+        left: 6px;
+        top: 6px;
+    }
+.highlighted {
+    background: #d4edda;
+}
+    .highlighted.amendement-batch,
+    .highlighted.amendement-batch:before,
+    .highlighted.amendement-batch:after,
+    .highlighted.amendement-card {
+        background-color: #d4edda;
+    }
+.button:not(.search-button) {
+    min-width: 10rem;
+    text-align: center;
+}
+.warning {
+    cursor: pointer;
+    margin-left: -.7rem;
+}
+.sticky {
+    position: sticky;
+    top: 0;
+}
+.sticky.shadowed {
+    background-color: white;
+    box-shadow: 2px 2px 5px 2px #CCC;
+}
+.table thead th {
+    border: none;
+}
+.table tbody tr td {
+    border: none;
+    padding: 0;
+}
+label {
+    font-weight: 600;
+    margin-bottom: 0;
+}
+.filters {
+    text-align: center;
+    padding: .5rem 3rem;
+    width: 100% !important;
+}
+    .table .filters th {
+        vertical-align: baseline;
+    }
+.svg-icons {
+    position: absolute;
+    width: 0;
+    height: 0;
+}
+img.warning-icon {
+   width: 20px;
+   cursor: pointer;
+   vertical-align: top;
+}
+.bloc-filtres {
+    text-align: center;
+    padding: 1rem;
+    margin: 0 3rem;
+}
+.bloc-filtres .groupActions a {
+    margin: 0.5rem;
+}
+.bloc-filtres .groupActions span {
+    font-weight: 800;
+}
+.filters div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.filters input {
+    width: 4rem;
+    padding: 0 .25rem;
+}
+.filters div #select-all {
+    width: 2rem;
+    transform: scale(1.5);
+}
+#filtre-tags {
+    padding-top: 1rem;
+}
+div#filtre-tags div.selectize-control,
+div#filtre-tags div.selectize-input {
+    width: 100% !important;
+    text-align: left;
+}
+div#filtre-tags div.selectize-input {
+    display: block;
+    text-align: left;
+}
+div#filtre-tags div.selectize-dropdown-content {
+    display: block;
+}
+div#filtre-tags .item {
+	white-space: nowrap;
+	display: inline-flex;
+}
+
+/* Boutons recherche rapide et gestion tags */
+.search-style{
+    height: 38px;
+    margin: 3rem;
+    justify-content: space-between !important;
+}
+#search-amendement .quick-search {
+    margin: 0;
+}
+div.selectize-control,
+div.selectize-input {
+    width: 20rem !important;
+}
+div.selectize-control.single div.item {
+    max-width: 17rem;
+}
+
+/* Liste des tags */
+.amendement-tags {
+    margin-top: 1rem;
+    display: flex;
+}
+.select-tags,
+.amendement-tags div.selectize-control,
+.amendement-tags div.selectize-input {
+    width: 100% !important;
+    border-radius: 5px !important;
+}
+
+.selectize-control.plugin-remove_button .item .remove {
+    width: 1.5rem;
+    text-align: center;
+    border-radius: 0 10px 10px 0 !important;
+    font-size: large;
+    padding: 4px 4px 0 0 !important;
+    margin: -10px -10px -10px 5px;
+    height: 24px;
+}
+.selectize-control.plugin-remove_button .item .remove:hover {
+    background: rgba(0,0,0,.1) !important;
+}
+
+/* Page Gestion des tags */
+div.box.tags {
+    margin: 3rem;
+}
+div.add-tag form {
+    margin: 1rem;
+}
+div.add-tag form label {
+    font-size: 1.2rem;
+}
+div.add-tag #label-tag {
+    width: 100%;
+    margin-bottom: 2rem;
+    font-size: 1.2rem;
+}
+div.add-tag #submit-new-tag {
+    display: block;
+    margin: auto;
+}
+.champs-texte {
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+}
+.tags .champs-texte {
+    width: 26rem;
+}
+div.info-tag {
+    width: 100%;
+    margin: 1rem 0;
+}
+.tags h3 {
+    margin: 1rem 0 2rem;
+}
+.info-tag .form-group {
+    display: inline-flex;
+    align-items: center;
+}
+.info-tag input[name="submit-edit"],
+.info-tag input[name="submit-edit"]:hover,
+.edit-button,
+.edit-button:hover {
+    margin: 0 1rem;
+}
+.info-tag input[name="submit-edit"],
+.info-tag input[name="submit-edit"]:hover,
+.info-tag input[name="submit-delete"],
+.info-tag input[name="submit-delete"]:hover,
+.edit-button,
+.edit-button:hover,
+.cancel-button,
+.cancel-button:hover {
+    width: 9rem;
+    height: 2.5rem;
+    min-width: auto !important;
+    padding-right: 0 !important;
+}
+.info-tag div.champs-texte {
+    border: none;
+}
+
+/* Surcharge du comportement selectize */
+.selectize-control.multi.select-tags .selectize-input {
+    border: none;
+}
+.selectize-control.multi .selectize-input > div.active {
+  background: #3167a6 !important;
+}
+.selectize-control.multi .selectize-input > div {
+	-webkit-border-radius: 20px !important;
+	-moz-border-radius: 20px !important;
+	border-radius: 20px !important;
+    padding: 2px 10px !important;
+    font-size: 0.9rem !important;
+}
+.new-tag {
+    width: 2rem;
+    text-align: center;
+    height: 1.5rem;
+    border-radius: 20px;
+    cursor: pointer;
+    margin: 5px 4px 0 0;
+    overflow: hidden;
+    padding-left: 2rem;
+}
+
+/* Scroll top spécifique pour l'espace de travail */
+main.table-detail #scrollUp {
+    margin-left: 100px !important;
+}
+
+form{
+    margin: 0.5rem;
+}
+
+form input{
+    color: inherit;
+    background: none;
+    border: none;
+    padding: 0;
+    line-height: inherit;
+}

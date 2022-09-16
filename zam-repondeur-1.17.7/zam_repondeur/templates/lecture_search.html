@@ -1,0 +1,214 @@
+{% extends "_base_index.html" %}
+{% import "macros.html" as macros %}
+
+{% block custom_style %}
+    #recherche-button {
+        background: no-repeat 1rem url("{{ request.static_url('zam_repondeur:static/img/loupe.svg') }}") #3167a6;
+    }
+    #recherche-button:hover {
+        background: no-repeat 1rem url("{{ request.static_url('zam_repondeur:static/img/loupe_bleue.svg') }}") #fff;
+    }
+    #redo_search {
+        background: no-repeat 1rem / 1rem url("{{ request.static_url('zam_repondeur:static/img/trash-white.svg') }}") #3167a6;
+    }
+    #redo_search:hover {
+        background: no-repeat 1rem / 1rem url("{{ request.static_url('zam_repondeur:static/img/trash-blue.svg') }}") #fff;
+    }
+    #export_results {
+        background: no-repeat 1rem / 1rem url("{{ request.static_url('zam_repondeur:static/img/excel-icon-blue.svg') }}") #fff;
+    }
+    #export_results:hover {
+        background: no-repeat 1rem / 1rem url("{{ request.static_url('zam_repondeur:static/img/excel-icon-white.svg') }}") #3167a6;
+    }
+{% endblock %}
+
+{% block main_class %}
+box box-large search-page{% if not active_search %} d-none{% endif %}
+{% endblock %}
+
+{% block extra_box %}
+<div id="search" class="box">
+    <h1>Recherche avancée</h1>
+    <h2 class="subtitle">{{ lecture.dossier.titre }}</h2>
+    <p class="subtitle">{{ lecture }}, {{ lecture.amendements|length }} amendements</p>
+    <form id="search-derouleur" name="search-derouleur" method="POST" action="{{ request.resource_url(context) }}">
+        <div id="search-body">
+            <div id="search-contenu">
+                <h4>Amendements</h4>
+
+                <div class="form-group">
+                    <label for="expose">Exposé</label>
+                    <div class="search-champs">
+                        <input type="text" id="expose" name="expose" value="{% if search_values['expose'] %}{{ search_values['expose'][0] }}{% endif %}" class="form-control">
+                        <div class="options-search">
+                            <input type="checkbox" id="exact-search-expose" name="exact-search-expose" class="exact-search" title="Recherche exacte de l'exposé" alt="Recherche exacte de l'exposé" value="1" {% if 'exact-search-expose' in search_values %}checked{% endif %}>
+                            <span>Recherche exacte</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="corps">Corps</label>
+                    <div class="search-champs">
+                        <input type="text" id="corps" name="corps" value="{% if search_values['corps'] %}{{ search_values['corps'][0] }}{% endif %}" class="form-control">
+                        <div class="options-search">
+                            <input type="checkbox" id="exact-search-corps" name="exact-search-corps" class="exact-search" title="Recherche exacte du corps" alt="Recherche exacte du corps" value="1" {% if 'exact-search-corps' in search_values %}checked{% endif %}>
+                            <span>Recherche exacte</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="auteur">Auteur</label>
+                    <div class="search-champs">
+                        <select id="auteur" name="auteurs" class="form-control select-multiple" multiple placeholder="Choisir un ou plusieurs auteurs" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                            <option value="Aucun" {% if search_values['auteurs'] and "aucun" in search_values['auteurs'] %}selected{% endif %}>Aucun</option>
+                            {% for auteur in auteurs %}
+                                <option value="{{ auteur }}" {% if search_values['auteurs'] and auteur.lower() in search_values['auteurs'] %}selected{% endif %}>{{ auteur }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="options-search"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="groupe">Groupe parlementaire</label>
+                    <div class="search-champs">
+                        <select id="groupe" name="groupes" class="form-control select-multiple" multiple placeholder="Choisir un ou plusieurs groupes" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                            <option value="Aucun" {% if search_values['groupes'] and "aucun" in search_values['groupes'] %}selected{% endif %}>Aucun</option>
+                            {% for groupe in groupes %}
+                                <option value="{{ groupe }}" {% if search_values['groupes'] and groupe.lower() in search_values['groupes'] %}selected{% endif %}>{{ groupe }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="options-search"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="sort">Sort</label>
+                    <div class="search-champs">
+                        <select id="sort" name="sorts" class="form-control select-multiple" multiple placeholder="Choisir un ou plusieurs sorts" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                            <option value="Autres" {% if search_values['sorts'] and "autres" in search_values['sorts'] %}selected{% endif %}>Autres</option>
+                            {% for value in sort %}
+                                <option value="{{ value }}" {% if search_values['sorts'] and value.lower() in search_values['sorts'] %}selected{% endif %}>{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="options-search"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="search-reponse">
+                <h4>Réponses</h4>
+
+                <div class="form-group">
+                    <label for="position">Avis du gouvernement</label>
+                    <div class="search-champs">
+                        <select id="position" name="positions" class="form-control select-multiple" multiple placeholder="Choisir un ou plusieurs avis" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                            <option value="Aucun" {% if search_values['positions'] and "aucun" in search_values['positions'] %}selected{% endif %}>Aucun</option>
+                            {% for value in avis %}
+                                <option value="{{ value }}" {% if search_values['positions'] and value.lower() in search_values['positions'] %}selected{% endif %}>{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="options-search"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="objet">Objet</label>
+                    <div class="search-champs">
+                        <input type="text" id="objet" name="objet" value="{% if search_values['objet'] %}{{ search_values['objet'][0] }}{% endif %}" class="form-control">
+                        <div class="options-search">
+                            <input type="checkbox" id="exact-search-objet" name="exact-search-objet" class="exact-search" title="Recherche exacte de l'objet" alt="Recherche exacte de l'objet" value="1" {% if 'exact-search-objet' in search_values %}checked{% endif %}>
+                            <span>Recherche exacte</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="reponse">Réponse</label>
+                    <div class="search-champs">
+                        <input type="text" id="reponse" name="reponse" value="{% if search_values['reponse'] %}{{ search_values['reponse'][0] }}{% endif %}" class="form-control">
+                        <div class="options-search">
+                            <input type="checkbox" id="exact-search-reponse" name="exact-search-reponse" class="exact-search" title="Recherche exacte de la réponse" alt="Recherche exacte de la réponse" value="1" {% if 'exact-search-reponse' in search_values %}checked{% endif %}>
+                            <span>Recherche exacte</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="commentaires">Commentaires</label>
+                    <div class="search-champs">
+                        <input type="text" id="commentaires" name="commentaires" value="{% if search_values['commentaires'] %}{{ search_values['commentaires'][0] }}{% endif %}" class="form-control">
+                        <div class="options-search">
+                            <input type="checkbox" id="exact-search-commentaires" name="exact-search-commentaires" class="exact-search" title="Recherche exacte des commentaires" alt="Recherche exacte des commentaires" value="1" {% if 'exact-search-commentaires' in search_values %}checked{% endif %}>
+                            <span>Recherche exacte</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group save-button">
+            <input type="submit" id="recherche-button" name="recherche-button" value="Lancer la recherche" class="button primary enabled">
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_buttons %}
+<div id="extra_search_buttons">
+    <form name="form_redo_search" method="POST" action="{{ request.resource_url(context) }}">
+        <input id="redo_search" name="redo_search" type="submit" class="button primary enabled" value="Effacer la recherche actuelle">
+    </form>
+    <form id="form_export_results" name="form_export_results" method="post" action="{{ request.resource_url(context.parent, 'download_search') }}">
+        {% for amendement in all_amendements %}
+            <input name="nums" type="hidden" value="{{ amendement.num }}">
+        {% endfor %}
+        <input name="format" type="hidden" value="xlsx">
+        <input id="export_results" name="export_results" type="submit" class="button primary" value="Exporter au format Excel">
+    </form>
+</div>
+{% endblock %}
+
+{% block titre_derouleur %}
+    <h1>Résultats de la recherche</h1>
+{% endblock %}
+{% block infos_derouleur %}{% endblock %}
+{% block contact_coordinateur %}{% endblock %}
+
+{% block info_no_amendement %}
+    <div class="notice">
+        <h3>Aucun amendement trouvé.</h3>
+        <p>Aucun amendement n'a été trouvé avec les éléments que vous avez sélectionnés.</p>
+        <p>Vous pouvez effectuer une nouvelle recherche avec d'autres critères.</p>
+    </div>
+{% endblock %}
+
+{% block transfer_button %}
+    <form id="transfer_multiple_choices" name="transfer_multiple_choices" method="post" action=""
+        data-url-transfer="{{ request.resource_url(context.parent, 'transfer_amendements') }}">
+        <input type="hidden" name="from_index" value="1">
+        <div id="nums-to-transfer-multiple" class="d-none"></div>
+        <input id="submit-table" name="submit-table" type="submit" value="Transférer"
+            class="button primary{% if not dossier_resource.dossier.team.active %} disabled read-only{% endif %}">
+    </form>
+    <form id="transfer_on_workspace" name="transfer_on_workspace" method="post" action=""
+          {% if not dossier_resource.dossier.team.active %} hidden{% endif %}
+          data-url-workspace="{{ request.resource_url(context.parent, 'tables', request.user.email) }}"
+          data-url-transfer="{{ request.resource_url(context.parent, 'transfer_amendements') }}">
+        <input type="hidden" name="from_search" value="1">
+        <input type="hidden" name="direct_transfer" value="1">
+        <input type="hidden" name="back" value="{{ request.resource_url(context) }}">
+        <div id="nums-to-transfer" class="d-none"></div>
+        <input id="submit-table" name="submit-table" type="submit" value="Transférer sur mon espace de travail"
+               class="button primary{% if not dossier_resource.dossier.team.active %} disabled read-only{% endif %}">
+    </form>
+{% endblock %}
+
+{% block custom_script %}
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", () => {
+            $(".select-multiple").selectize({
+                plugins: ['no_results', 'selectize-plugin-a11y'],
+                valueField: "auteur",
+                labelField: "auteur",
+                searchField: ["auteur"],
+                create: false,
+                maxItems: null,
+            })
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "_base_dossier_invit.html" %}
+
+{% block titre_invit %}
+    <h2>Demander une invitation à un dossier archivé</h2>
+{% endblock %}
+
+{% block label_invit %}
+    <label for="dossier">Dossier législatif archivé</label>
+{% endblock %}
+
+{% block back_invit %}
+    <a href="{{ request.resource_url(context, 'archives') }}" class="arrow-left">Retour</a>
+{% endblock %}

@@ -1,0 +1,97 @@
+h3.line-through {
+    margin: 2rem auto;
+    width: 40rem;
+    font-size: 1.5rem;
+}
+form {
+    margin: 3rem auto;
+}
+    form .infos *:not(.notice *):not(summary) {
+        width: 100%;
+    }
+    form .amendements,
+    form .corbeilles {
+        margin-bottom: 1rem;
+    }
+        form .amendements li,
+        form .corbeilles li {
+            display: flex;
+            align-items: baseline;
+        }
+            form .amendements input[type="checkbox"],
+            form .corbeilles input[type="checkbox"] {
+                margin: .5rem 1rem .5rem 1rem;
+                transform: scale(1.5);
+            }
+            form .amendements label,
+            form .corbeilles label {
+                margin: .5rem 1rem .5rem 0;
+                font-weight: normal;
+            }
+                form .amendements a,
+                form .corbeilles a {
+                    text-decoration: underline;
+                }
+    form label {
+        display: block;
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    form input[type="submit"] {
+        text-align: center;
+        margin: 1.5rem 0;
+    }
+    form input[type="submit"].enabled {
+        width: 12rem;
+    }
+    form input[type="submit"]:not(.enabled) {
+        width: 22rem;
+    }
+    form .buttons {
+        text-align: right;
+    }
+        form .buttons.transfer-multiple-choices-custom {
+            text-align: center;
+        }
+        form .buttons.transfer-multiple-choices-custom input {
+            margin: 1rem;
+        }
+    form details,
+    form .infos > div {
+        margin-bottom: 2rem;
+    }
+        form div.targets {
+            margin-bottom: 0;
+        }
+    form summary,
+    form .infos div p {
+        margin: 0 1.5rem 1rem;
+        font-size: 1.3rem;
+    }
+    form div.infos {
+        margin: 0 auto;
+        width: 40rem;
+    }
+p.alert-transfer-direct {
+    margin: 2rem 0;
+    text-align: center;
+}
+
+div.targets.lectures {
+    margin: 2rem 0;
+}
+
+h2.subtitle {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 1.5rem;
+}
+p.subtitle {
+    font-style: italic;
+    font-size: 1.1rem;
+    text-align: center;
+    font-weight: normal;
+    margin-bottom: 1.5rem;
+}

@@ -1,0 +1,36 @@
+{% extends "_base.html" %}
+
+{% block header %}
+<link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/selectize/css/selectize.css') }}">
+<link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/selectize/css/selectize.bootstrap3.css') }}">
+<link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/css/manage.css') }}">
+{% endblock %}
+
+{% block body %}
+    <form id="add-admins" action="{{ request.path }}" method="POST">
+        <h2>Ajout d’une personne au statut d’administrateur</h2>
+        <div class="form-group">
+            <label for="user_pk">Personnes actuellement inscrites</label>
+            <select name="user_pk" class="form-control" required>
+                <option value="" selected></option>
+                {% for user in users %}
+                    <option value="{{ user.pk }}">{{ user }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group save-buttons">
+            <a href="{{ request.resource_url(context) }}" class="arrow-left">Retour</a>
+            <input type="submit" name="submit" value="Ajouter" class="button enabled primary">
+        </div>
+    </form>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ request.static_url('zam_repondeur:static/selectize/js/standalone/selectize.min.js') }}"></script>
+<script src="{{ request.static_url('zam_repondeur:static/selectize/plugins/selectize-plugin-a11y.js') }}"></script>
+<script src="{{ request.static_url('zam_repondeur:static/selectize/plugins/selectize_no_results.js') }}"></script>
+<script type="text/javascript">
+    ;(_ => $('[name="user_pk"]').selectize({plugins: ['no_results', 'selectize-plugin-a11y']}))()
+</script>
+{% endblock %}

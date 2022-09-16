@@ -1,0 +1,15 @@
+.notice {
+    max-width: 30rem;
+    text-align: center;
+    margin: 3rem auto;
+    font-size: 1.4rem;
+}
+
+.form-group:not(.delete-box) {
+    text-align: center;
+    margin: 5rem 0 3rem;
+    font-size: 1.5rem;
+}
+    .form-group:not(.delete-box) input {
+        margin-left: 1rem;
+    }

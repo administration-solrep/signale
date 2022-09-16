@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang=fr>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,minimum-scale=1,initial-scale=1,shrink-to-fit=no">
+<title>{{ lecture.dossier.titre }} — {{ lecture }}</title>
+<link rel=icon href="data:;base64,iVBORw0KGgo=">
+<link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/fonts.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/visionneuse.css') }}">
+{% block style_scrolltop %}
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/css/scroll_top.css') }}">
+{% endblock %}
+{% block extra_styles %}{% endblock %}
+</head>
+
+<body>
+
+<nav class="main">
+  <span>
+    <a class="list" href="{{ request.resource_url(context.parent if article is defined else context) }}">Liste des articles</a>
+  </span>
+  <span><a class="find" href="">Accès amendement</a></span>
+</nav>
+
+<form class="search is-none" id="search-amendements" method="get" role="search" action="" data-amendement-matches='{{ lecture|amendement_matches|tojson }}'>
+  <label for="q-amendement">Amendement nº</label>
+  <span class="number-with-hint">
+    <input name="q-amendement" id="q-amendement" type="number" min="1" step="1">
+    <span class="hint">Chiffres uniquement</span>
+  </span>
+  <input type="submit" name="submit" value="Valider">
+  <p class="error hide">Amendement non trouvé.</p>
+</form>
+
+<div class="title">
+  {% block title %}{% endblock %}
+</div>
+
+{% block secondary_nav %}{% endblock %}
+
+<main class="banc">
+  {% block main %}{% endblock %}
+
+  {% block scrolltop %}
+    {# En cas de mise à jour du bouton, mettre également à jour celui du fichier templates/_base.html #}
+    <div id="positionneur_scrollUp">
+        <div id="scrollUp">
+            <a href="#top" title="Haut de page">
+                <svg viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path class="arrow" d="M256 38C135.602 38 38 135.602 38 256C38 376.398 135.602 474 256 474C376.398 474 474 376.398 474 256C474 135.602 376.398 38 256 38Z" fill="white"/>
+                    <path class="round" d="M256 0C114.615 0 0 114.615 0 256C0 397.385 114.615 512 256 512C397.385 512 512 397.385 512 256C512 114.615 397.385 0 256 0ZM376.304 311.445L256 191.532L135.696 311.445L111.865 287.535L256 143.869L400.135 287.536L376.304 311.445Z" fill="#3167A6"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+  {% endblock %}
+</main>
+
+{% block bottom_nav %}{% endblock %}
+
+<script type="text/javascript">window.__forceSmoothScrollPolyfill__ = true</script>
+<script src="{{ request.static_url('zam_repondeur:static/smoothscroll/smoothscroll.js') }}"></script>
+<script src="{{ request.static_url('zam_repondeur:static/js/stimulus.js') }}"></script>
+<script>;(() => window.application = Stimulus.Application.start())()</script>
+<script src="{{ request.static_url('zam_repondeur:static/js/visionneuse.js') }}"></script>
+{% block script_scrolltop %}
+    <script src="{{ request.static_url('zam_repondeur:static/jquery/jquery-3.4.1.min.js') }}"></script>
+    <script src="{{ request.static_url('zam_repondeur:static/js/scrollTop.js') }}"></script>
+{% endblock %}
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,72 @@
+{% extends "_base.html" %}
+{% import "macros.html" as macros %}
+
+{% block header %}
+    <style type="">
+        div.error_code {
+            text-align: center;
+            font-style: italic;
+            color: #888;
+        }
+        #not_found p {
+            margin: 3rem 0;
+            text-align: center;
+        }
+        #not_found_menu {
+            display: flex;
+            text-align: center;
+            width: 100%;
+            justify-content: space-around;
+            margin-bottom: 2rem;
+        }
+        #not_found_menu a {
+            padding: 2rem;
+            border-radius: 1rem;
+            margin: 0 1rem;
+            background-color: #fff;
+            color: #3167a6;
+            border: 1px solid #3167a6;
+            font-size: 1.25rem;
+            width: 20rem;
+        }
+        #not_found_menu a:hover {
+            background-color: #3167a6;
+            color: white;
+            text-decoration: none;
+        }
+        a svg {
+            display: block;
+            width: 100%;
+            height: 2rem;
+            margin: 1rem 0;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <section id="not_found">
+        <h1>Page introuvable !</h1>
+
+        <div class="error_code">(Erreur 404)</div>
+
+        <p>La page que vous recherchez n'existe pas ou n'est plus disponible.</p>
+
+        <div id="not_found_menu">
+            <a href="{{ request.resource_url(request.root, 'dossiers') }}" class="home">
+                <svg role="img" aria-label="Retour sur la liste des dossiers" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house-fill" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6zm5-.793V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
+                    <path fill-rule="evenodd" d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"/>
+                </svg>
+                Retourner sur la liste des dossiers
+            </a>
+            <a href="{{ request.resource_url(request.root, 'dossiers', 'archives') }}" class="archive">
+                <svg role="img" aria-label="Retour sur la liste des dossiers archivés" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-zip-fill" viewBox="0 0 16 16" style="display: block;width: 100%;height: 2rem;margin: 1rem 0;">
+                    <path d="M8.5 9.438V8.5h-1v.938a1 1 0 0 1-.03.243l-.4 1.598.93.62.93-.62-.4-1.598a1 1 0 0 1-.03-.243z"></path>
+                    <path d="M4 0h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm2.5 8.5v.938l-.4 1.599a1 1 0 0 0 .416 1.074l.93.62a1 1 0 0 0 1.109 0l.93-.62a1 1 0 0 0 .415-1.074l-.4-1.599V8.5a1 1 0 0 0-1-1h-1a1 1 0 0 0-1 1zm1-5.5h-1v1h1v1h-1v1h1v1H9V6H8V5h1V4H8V3h1V2H8V1H6.5v1h1v1z"></path>
+                </svg>
+                Retourner sur la liste des dossiers archivés
+            </a>
+        </div>
+
+    </section>
+{% endblock %}

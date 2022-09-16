@@ -1,0 +1,18 @@
+{# -----------------------------------
+  Headers used for the PDF outline:
+  - H1: dossier législatif
+  - H2: article
+  - H3: amendement
+ ----------------------------------- #}
+{% import 'print/macros.html' as macros %}
+<!doctype html>
+<html lang=fr>
+<head>
+  <meta charset=utf-8>
+</head>
+<body>
+  <div class="first-page page">
+    <h1>{{ lecture.dossier.titre }}</h1>
+    <div class="lecture">{{ lecture }}</div>
+  </div>
+</body>

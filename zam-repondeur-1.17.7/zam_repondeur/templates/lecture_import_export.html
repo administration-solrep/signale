@@ -1,0 +1,241 @@
+{% extends "_base_lecture.html" %}
+{% import "macros.html" as macros %}
+
+{% block header %}
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/selectize/css/selectize.css') }}">
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/selectize/css/selectize.bootstrap3.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/import_export.css') }}">
+    <style>
+        input[type="submit"].xls-icon {
+	        background: no-repeat 5rem / .8rem url("{{ request.static_url('zam_repondeur:static/img/excel-icon-blue.svg') }}") #fff;
+	    }
+	    input[type="submit"].xls-icon:hover {
+	        background: no-repeat 5rem / .8rem url("{{ request.static_url('zam_repondeur:static/img/excel-icon-white.svg') }}") #3167A6;
+	    }
+	    input[type="submit"].pdf-icon {
+	        background: no-repeat 5rem / .8rem url("{{ request.static_url('zam_repondeur:static/img/pdf-icon-blue.svg') }}") #fff;
+	    }
+	    input[type="submit"].pdf-icon:hover {
+	        background: no-repeat 5rem / .8rem url("{{ request.static_url('zam_repondeur:static/img/pdf-icon-white.svg') }}") #3167A6;
+	    }
+	    input[type="submit"].json-icon {
+	        background: no-repeat 3rem / .8rem url("{{ request.static_url('zam_repondeur:static/img/archive-icon-blue.svg') }}") #fff;
+	    }
+	    input[type="submit"].json-icon:hover {
+	        background: no-repeat 3rem / .8rem url("{{ request.static_url('zam_repondeur:static/img/archive-icon-white.svg') }}") #3167A6;
+	    }
+    </style>
+{% endblock %}
+
+{% block body %}
+{{ macros.msg_readonly(active, 0) }}
+
+<h1>Export {{ "/ Import" if (request.user.is_admin or lecture.dossier.team.is_coordinator(request.user)) and active else "de données" }}</h1>
+
+{% if has_permission %}
+<div class="last-update">
+    <a class="underlined" href="{{ request.resource_url(context, 'journal') }}">Journal</a>
+</div>
+{% endif %}
+
+{% if export_data %}
+<div class="box downloads-pdf">
+    <h3>Téléchargements du dossier de banc en PDF</h3>
+    <table>
+        <caption>Sont disponibles ici les dossiers de banc au format PDF avec deux articles exportés ou plus.</caption>
+        <thead>
+            <tr>
+                <td>Utilisateur</td>
+                <td>Articles exportés</td>
+                <td>Crée le</td>
+                <td>Expire le</td>
+                <td>Actions</td>
+            </tr>
+        </thead>
+        <tbody>
+        {% for export in export_data %}
+        <tr>
+            <td><abbr title="{{ export['usermail'] }}">{{ export["username"] }}</abbr></td>
+            <td>{{ "Tous" if not export["articles"] else export["articles"] | enumeration | replace("Art. ", "")  }}</td>
+            <td>{{ export["created_at"].strftime('%d/%m/%Y à %H:%M:%S') }}</td>
+            <td>{{ export["expires_at"].strftime('%d/%m/%Y à %H:%M:%S') }}</td>
+            <td>
+                <form action="{{ request.resource_url(context) }}" method="post">
+                    <input name="download-key" type="hidden" value="{{ export['key'] }}" />
+                    <input name="download-pdf" type="submit" class="button primary enabled" value="Télécharger" />
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<div class="box" data-controller="multiple-clicks">
+    <div class="flex-line">
+        <div>
+            <h3>Exporter un tableau</h3>
+            <p>au format Excel, pour obtenir un tableau de RIM par exemple.</p>
+        </div>
+        <form id="export-xlsx" name="export-xlsx" method="post" action="{{ request.resource_url(context, 'download_amendements') }}">
+            <input type="hidden" id="format-xlsx" name="format" value="xlsx" />
+            <input id="xls" type="submit" value="Tableau" class="button primary xls-icon" data-action="multiple-clicks#prevent" />
+        </form>
+    </div>
+
+    <div class="flex-line">
+        <div>
+            <h3>Exporter un dossier</h3>
+            <p>au format PDF, pour obtenir un dossier imprimable.</p>
+        </div>
+        <form id="export-pdf" name="export-pdf" method="post" action="{{ request.resource_url(context, 'download_amendements') }}">
+            <select id="select-articles" name="articles" class="form-control" multiple autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                <option value="all" selected="selected">Tous les articles</option>
+                {% for article in lecture.articles|sort %}
+                    {% if article.type %}
+                        <option value="{{ article.url_key }}">{{ article }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <input type="hidden" id="format-pdf" name="format" value="pdf" />
+            <input id="pdf" type="submit" value="Dossier" class="button primary pdf-icon" data-action="multiple-clicks#prevent" />
+        </form>
+    </div>
+
+    <div class="flex-line">
+        <div>
+            <h3>Exporter un fichier technique structuré</h3>
+            <p>au format JSON.</p>
+        </div>
+        <form id="export-json" name="export-json" method="post" action="{{ request.resource_url(context, 'download_amendements') }}">
+            <input type="hidden" id="format-json" name="format" value="json" />
+            <input id="json" type="submit" value="Fichier technique" class="button primary json-icon" data-action="multiple-clicks#prevent" />
+        </form>
+    </div>
+
+</div>
+
+    {% if active and has_permission %}
+        <div class="box">
+            <section data-target="amendements-options.details">
+                <div class="flex-line" data-controller="filename">
+                    <div>
+                        <h3>Importer des saisies</h3>
+                        <p>
+                            L’import de saisies permet, en une seule opération, de remplir les fiches de banc (avis, réponses, objet, etc) de plusieurs amendements, à partir d’un fichier Excel converti en CSV.
+                            <a class="underlined" href="{{ request.route_url('aide_import') }}" target="_blank" rel="noopener noreferrer">
+                                Cliquer ici pour consulter le guide dédié
+                            </a>.
+                        </p>
+                    </div>
+                    <form action="{{ request.resource_url(context, 'import_csv') }}" enctype="multipart/form-data" method="post" id="import-form">
+                        <div class="custom-file">
+                            <input type="file" data-action="filename#display" class="custom-file-input" id="reponses" name="reponses" required>
+                            <label class="custom-file-label" for="reponses">Fichier CSV</label>
+                        </div>
+                        <div role="group">
+                            <input type="submit" 
+                                   name="upload" 
+                                   class="button primary enabled centered" 
+                                   value="Importer">
+                        </div>
+                    </form>
+                </div>
+        
+                <!-- Fonctionnalité désactivée depuis la version 1.15
+                <div class="flex-line" data-controller="filename">
+                    <div>
+                        <h3>Importer une liasse XML</h3>
+                        <p>Importer des amendements à partir d'un fichier XML provenant
+                        de l’Assemblée nationale.</p>
+                    </div>
+                    <form action="{{ request.resource_url(context, 'import_liasse_xml') }}" enctype="multipart/form-data" method="post" id="import-liasse-xml" class="align-items-center">
+                        <div class="custom-file">
+                            <input type="file" data-action="filename#display" class="custom-file-input" id="liasse" name="liasse" required>
+                            <label class="custom-file-label" for="liasse">Fichier XML</label>
+                        </div>
+                        <div role="group">
+                            <input type="submit" 
+                                   name="upload" 
+                                   class="button primary enabled" 
+                                   value="Importer">
+                        </div>
+                    </form>
+                </div-->
+        
+                <div class="flex-line" data-controller="filename">
+                    <div>
+                        <h3>Importer un fichier technique structuré</h3>
+                        <p>L’import d’un JSON permet d’interfacer Signale avec un autre outil.</p>
+                    </div>
+                    <form action="{{ request.resource_url(context, 'import_backup') }}" enctype="multipart/form-data" method="post" id="backup-form">
+                        <div class="custom-file">
+                            <input type="file" data-action="filename#display" class="custom-file-input" id="backup" name="backup" required>
+                            <label class="custom-file-label" for="backup">Fichier JSON</label>
+                        </div>
+                        <div role="group">
+                            <input type="submit" 
+                                   name="upload" 
+                                   class="button primary enabled centered " 
+                                   value="Importer">
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ request.static_url('zam_repondeur:static/selectize/js/standalone/selectize.min.js') }}"></script>
+<script src="{{ request.static_url('zam_repondeur:static/selectize/plugins/selectize-plugin-a11y.js') }}"></script>
+<script src="{{ request.static_url('zam_repondeur:static/selectize/plugins/selectize_no_results.js') }}"></script>
+<script src="{{ request.static_url('zam_repondeur:static/selectize/plugins/selectize_fr.js') }}"></script>
+<script src="{{ request.static_url('zam_repondeur:static/js/amendements.js') }}"></script>
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", () => {
+        var $select_articles = $("#select-articles").selectize({
+            plugins: ['no_results', 'selectize-plugin-a11y', 'remove_button', 'lang_fr'],
+            onInitialize: () => {
+                $("#select-article-selectized").attr("spellcheck", "false")
+            },
+            onItemAdd: function(target){
+                if(target !== "all" && this.items.indexOf("all") == 0){
+                    this.removeItem("all", true)
+                } else if(this.items.indexOf("all") > 0){
+                    this.clear(true)
+                    this.addItem("all", true)
+                }
+                setOnClickAttr($select_articles[0].selectize.order, $select_articles[0].selectize.items.length, target)
+            },
+            onItemRemove: function(target){
+                if(this.items.length == 0){
+                    this.addItem("all", true)
+                    target = "all"
+                }
+                setOnClickAttr($select_articles[0].selectize.order, $select_articles[0].selectize.items.length, target)
+            }
+        })
+        setOnClickAttr($select_articles[0].selectize.order, $select_articles[0].selectize.items.length, "all")
+    })
+    function setOnClickAttr(options, nb, target){
+        if(nb === 1){
+            if(target !== "all" || options < 3){
+                $("#pdf").attr("onclick", "setMessagePopup()")
+            } else {
+                $("#pdf").removeAttr("onclick")
+            }
+        } else {
+            $("#pdf").removeAttr("onclick")
+        }
+    }
+    function setMessagePopup(){
+        message = "Votre demande d’export d’un article du dossier de banc a bien été prise en compte. Merci de patienter."
+        $("div[role='status'] div").html("<p><span class='success-notification'></span> "+ message +"</p>")
+        $("div[role='status']").attr("data-notifications-kind", "success")
+        $("div[role='status']").attr("data-notifications-message", message)
+        $("div[role='status']").addClass("notification-success").removeClass("d-none")
+    }
+</script>
+{% endblock %}

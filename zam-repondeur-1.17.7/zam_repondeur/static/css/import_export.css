@@ -1,0 +1,78 @@
+.box .box {
+    margin: 4rem auto;
+    max-width: 45rem;
+}
+.flex-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: normal;
+    margin: 1rem 1rem 4rem;
+}
+    .flex-line > div {
+        margin-right: 3rem;
+    }
+    .flex-line p {
+        margin-bottom: 0;
+    }
+    .flex-line .button {
+        min-width: 15rem;
+        text-align: center;
+        margin-top: 1rem;
+    }
+    .flex-line .button-sm {
+        font-size: .9rem;
+        min-width: 1rem;
+        padding: 0.4rem 1rem 0.2rem 1rem;
+    }
+.flex-line-sm {
+    margin: 1rem;
+}
+h2 {
+    text-align: center;
+    font-weight: 600;
+    margin: 2.5rem 0 1.5rem 0;
+}
+p {
+    text-align: justify;
+}
+form {
+    max-width: 15rem;
+}
+input[type="submit"].xls-icon,
+input[type="submit"].pdf-icon,
+input[type="submit"].json-icon,
+input[type="submit"].zip-icon {
+    padding-left: 3rem;
+}
+
+form#download_zip,
+form#download_zip button {
+    max-width: 100%;
+    width: 100%;
+    font-size: 1.2rem;
+    margin: -1rem auto .5rem;
+    white-space: normal;
+}
+button.download,
+button.download:hover {
+    padding-left: 6rem !important;
+}
+button.download span {
+    font-size: 1rem;
+    font-style: italic;
+}
+
+div.downloads-pdf table {
+    width: 100%;
+}
+div.downloads-pdf table thead {
+    font-weight: 600;
+}
+div.downloads-pdf table td {
+    padding: .5rem 1rem;
+}
+div.downloads-pdf table caption {
+    caption-side: top;
+    padding: 0 0 2rem;
+    font-style: italic;
+}

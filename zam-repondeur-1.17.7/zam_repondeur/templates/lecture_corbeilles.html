@@ -1,0 +1,96 @@
+{% extends "_base_lecture.html" %}
+{% import "macros.html" as macros %}
+
+{% block header %}
+    <link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/amendements.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/lecture.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/corbeille.css') }}">
+{% endblock %}
+
+{% block body %}
+{{ macros.msg_readonly(active, 0) }}
+
+{% include "svg-file-icons.html" %}
+<h1>Corbeilles</h1>
+
+{% if affiche_dossier_de_banc %}
+<div class="box dossierbanc">
+    <h3>Dossier de banc</h3>
+    
+    <div class="progressbar rounded">
+        <div class="success rounded" style="width: {{ progress }}%;"></div>
+    </div>
+    <div class="infos">
+        <div>Progression : {{ progress }}%</div>
+        {% if current < 2 %}
+            <div>{{ current }} amendement sur {{ total }}</div>
+        {% else %}
+            <div>{{ current }} amendements sur {{ total }}</div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+
+<div id="shared-tables" class="box" data-controller="multiple-clicks">
+    <div class="flex-line">
+        <h3>Corbeilles</h3>
+        {% if active %}
+        <a class="button primary" 
+           href="{{ request.resource_url(context, 'add') }}">
+            Créer une nouvelle Corbeille
+        </a>
+        {% endif %}
+    </div>
+
+    {% if shared_tables %}
+        <table class="table">
+            <tbody>
+                {% for shared_table in shared_tables %}
+                    <tr>
+                        <td>
+                            {{ shared_table.titre }}
+                            {% set amendements_nb=shared_table.nb_amendements %}
+                            {% if amendements_nb %}
+                                {% if amendements_nb == 1 %}
+                                    (1 amendement)
+                                {% else %}
+                                    ({{ amendements_nb }} amendements)
+                                {% endif %}
+                            {% else %}
+                                (aucun amendement)
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if active %}
+                            <a class="button button-sm primary" href="{{ request.resource_url(context, shared_table.slug) }}">
+                                Modifier
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="flex-line">
+            Aucune Corbeille n’a été créée.
+            Créer une Corbeille permet de personnaliser l’organisation du travail pour cette lecture
+            (exemples : Corbeille « validé cabinet », Corbeille « visa directrice ok »).
+        </p>
+    {% endif %}
+
+</div>
+
+{% if active %}
+<div class="box import-corbeille">
+    <a class="button primary" href="{{ request.resource_url(context.parent, 'import_corbeilles') }}">
+        Importer les corbeilles d’une autre lecture
+    </a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ request.static_url('zam_repondeur:static/js/amendements.js') }}"></script>
+{% endblock %}

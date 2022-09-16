@@ -1,0 +1,27 @@
+{% extends "auth/_base_auth.html" %}
+
+{% block body %}
+<h1>Courriel validé !</h1>
+<p>
+    <strong>
+        Vous devriez recevoir un lien dans les minutes qui viennent sur l’adresse
+        « {{ email }} », vous permettant de vous connecter à Signale et d’accéder
+        aux dossiers disponibles.
+    </strong>
+</p>
+<p>
+    <a href="{{ request.route_url('login') }}" class="arrow-left">
+        Je me suis trompé de courriel
+    </a>
+</p>
+<p>
+    Si vous n’avez pas reçu de lien après plusieurs minutes, veuillez vérifier
+    si le courriel n’est pas dans votre dossier d’indésirables (spam),
+    vous pouvez en générer un nouveau
+    <a href="{{ request.route_url('login') }}">en cliquant ici</a>.
+</p>
+<p>
+    Si le problème persiste, vous pouvez nous contacter sur
+    <a href="mailto:{{ request.registry.settings.get('zam.contact_mail') }}">{{ request.registry.settings.get('zam.contact_mail') }}</a>
+</p>
+{% endblock %}

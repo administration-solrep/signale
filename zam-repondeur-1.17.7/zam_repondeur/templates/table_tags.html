@@ -1,0 +1,141 @@
+{% extends "_base_lecture.html" %}
+{% import "macros.html" as macros %}
+
+{% block header %}
+    <link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/table_detail.css') }}">
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/selectize/css/selectize.css') }}">
+    <link rel="stylesheet" href="{{ request.static_url('zam_repondeur:static/selectize/css/selectize.bootstrap3.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/search.css') }}">
+    <style type="text/css">
+        .notice nav a {
+            background-image: url("{{ request.static_url('zam_repondeur:static/img/big_right.svg') }}");
+        }
+        .edit-button {
+            background: no-repeat 1rem / 1rem url("{{ request.static_url('zam_repondeur:static/img/pencil-blue.svg') }}");
+        }
+        .edit-button:hover {
+            background: no-repeat 1rem / 1rem url("{{ request.static_url('zam_repondeur:static/img/pencil-white.svg') }}");
+        }
+        .cancel-button {
+            background: no-repeat 1rem / 1.5rem url("{{ request.static_url('zam_repondeur:static/img/cancel-white.svg') }}");
+        }
+        .cancel-button:hover {
+            background: no-repeat 1rem / 1.5rem url("{{ request.static_url('zam_repondeur:static/img/cancel-red.svg') }}");
+        }
+        input[name="submit-edit"] {
+            background: no-repeat 1rem / 1rem url("{{ request.static_url('zam_repondeur:static/img/valid-blue.svg') }}");
+        }
+        input[name="submit-edit"]:hover {
+            background: no-repeat 1rem / 1rem url("{{ request.static_url('zam_repondeur:static/img/valid-white.svg') }}");
+        }
+        input[name="submit-delete"] {
+            background: no-repeat 1rem / 1rem url("{{ request.static_url('zam_repondeur:static/img/trash-white.svg') }}");
+        }
+        input[name="submit-delete"]:hover {
+            background: no-repeat 1rem / 1rem url("{{ request.static_url('zam_repondeur:static/img/trash-red.svg') }}");
+        }
+    </style>
+{% endblock %}
+
+{% block main_class %}box table-detail{% endblock %}
+
+{% block body %}
+    {{ macros.msg_readonly(dossier_resource.dossier.team.active, 0) }}
+
+    <svg aria-hidden="true" class="svg-icons" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <defs>
+            <symbol id="person" viewBox="0 0 13 14">
+                <path d="M6.5 6.588c1.796 0 3.25-1.474 3.25-3.294S8.296 0 6.5 0 3.25 1.474 3.25 3.294 4.704 6.588 6.5 6.588zm0 1.647c-2.17 0-6.5 1.288-6.5 3.843V14h13v-1.922c0-2.555-4.33-3.843-6.5-3.843z"/>
+            </symbol>
+            <symbol id="identique" viewBox="0 0 19 22">
+                <path d="M14,0 L2,0 C0.9,0 0,0.9 0,2 L0,16 L2,16 L2,2 L14,2 L14,0 Z M17,4 L6,4 C4.9,4 4,4.9 4,6 L4,20 C4,21.1 4.9,22 6,22 L17,22 C18.1,22 19,21.1 19,20 L19,6 C19,4.9 18.1,4 17,4 Z M17,20 L6,20 L6,6 L17,6 L17,20 Z" id="Shape" fill="#000000"></path>
+            </symbol>
+            <symbol id="edit" viewBox="0 0 22 22">
+                <path d="M2.67 18.045l.644 3.658 3.658-.645 8.884-12.689-4.302-3.012L2.67 18.045zM18.637 4.87a1.088 1.088 0 0 0-.268-1.518l-2.962-2.074a1.088 1.088 0 0 0-1.517.268L12.27 3.862l4.747 3.324 1.622-2.316z"/>
+            </symbol>
+        </defs>
+    </svg>
+
+    <nav class="back">
+        <a href="{{ request.resource_url(context.parent) }}" class="arrow-left" tabindex="1">
+            Retourner à mon espace de travail
+        </a>
+    </nav>
+
+    <h1 data-controller="table-anchor" tabindex="1">Gestion des tags</h1>
+
+    <div class="box tags add-tag">
+        <form method="post" action="{{ request.resource_url(context) }}add">
+            <div class="form-group">
+                <label for="label-tag">Nom du nouveau tag</label>
+                <input id="label-tag" name="label" type="text" class="champs-texte form-control" tabindex="2" />
+                <input id="submit-new-tag" name="submit" type="submit" value="Ajouter" class="button primary enabled" tabindex="3" />
+            </div>
+        </form>
+    </div>
+
+    <div class="box tags">
+        <h3 tabindex="4">Liste des tags</h3>
+
+        {% if not tags %}
+            <p tabindex="5">Aucun tag n'a été créé.</p>
+        {% else %}
+            {% for tag in tags %}
+            <div class="info-tag">
+                <form method="post" action="{{ request.resource_url(context) }}edit">
+                    <div class="form-group">
+                        <input name="pk" type="hidden" value="{{ tag.pk }}" />
+                        <div id="label-{{ tag.pk }}" class="champs-texte" tabindex="{{ loop.index + 4 }}">{{ tag.label|safe }}</div>
+                        <input id="input-label-{{ tag.pk }}" name="label" type="text" value="{{ tag.label|safe }}" class="champs-texte form-control d-none" autofocus />
+                        <button id="button-edit-{{ tag.pk }}" name="button-edit" type="button" class="button primary edit-button" tabindex="{{ loop.index + 4 }}">Modifier</button>
+                        <input id="submit-edit-{{ tag.pk }}" name="submit-edit" type="submit" value="Enregistrer" class="button primary d-none" />
+                        <button id="button-cancel-{{ tag.pk }}" name="button-cancel" type="button" class="button danger enabled cancel-button d-none">Annuler</button>
+                        <input id="submit-delete-{{ tag.pk }}" name="submit-delete" type="submit" value="Supprimer" class="button danger enabled" tabindex="{{ loop.index + 4 }}" />
+                    </div>
+                </form>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        $(".edit-button").on("click", function(){
+            id = this.id.split("-")[2];
+            content = $("#label-" + id).html();
+            content_decoded = $('<div/>').html(content).text()
+
+            // Disable all edit and delete buttons
+            $('.edit-button, input[name="submit-delete"]').prop("disabled", true).addClass("disabled");
+
+            // Hide edit and delete buttons
+            $("#label-" + id).addClass("d-none");
+            $("#button-edit-" + id).addClass("d-none");
+            $("#submit-delete-" + id).addClass("d-none");
+
+            // Show save and cancel buttons
+            $("#input-label-" + id).removeClass("d-none").focus().val('').val(content_decoded);
+            $("#submit-edit-" + id).removeClass("d-none");
+            $("#button-cancel-" + id).removeClass("d-none");
+        })
+
+        $(".cancel-button").on("click", function(){
+            id = this.id.split("-")[2];
+            content = $("#label-" + id).html();
+            content_decoded = $('<div/>').html(content).text()
+
+            $('.edit-button, input[name="submit-delete"]').prop("disabled", false).removeClass("disabled");
+
+            // Hide save and cancel buttons
+            $("#input-label-" + id).val(content_decoded).addClass("d-none");
+            $("#submit-edit-" + id).addClass("d-none");
+            $("#button-cancel-" + id).addClass("d-none");
+
+            // Show edit and delete buttons
+            $("#label-" + id).removeClass("d-none");
+            $("#button-edit-" + id).removeClass("d-none").focus();
+            $("#submit-delete-" + id).removeClass("d-none");
+        })
+    </script>
+{% endblock %}

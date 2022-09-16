@@ -1,0 +1,295 @@
+{% extends "_base_dossier.html" %}
+{% import "macros.html" as macros %}
+
+{% block main_class %}box dossier-main{% endblock %}
+
+{% block header %}
+<link rel="stylesheet" type="text/css" href="{{ request.static_url('zam_repondeur:static/css/gestion.css') }}">
+{% endblock %}
+
+{% block body %}
+    {{ macros.msg_readonly(dossier.team.active, 0) }}
+
+    <nav class="back">
+        <a href="{{ request.resource_url(context) }}" class="arrow-left">Retourner à la liste des lectures</a>
+    </nav>
+
+    <h1>{{ dossier.titre }}</h1>
+    <div data-controller="dossier-help">
+        <div class="last-update">
+            Dernière mise à jour :
+            <time datetime="{{ dossier.last_event_datetime.isoformat(timespec='milliseconds') }}"
+                data-controller="timestamp"
+                data-timestamp-modified-at="{{ dossier.last_event_timestamp }}">
+                    {{ dossier.last_event_datetime | human_readable_time }}
+            </time>
+            <br>
+            <a class="underlined" href="{{ request.resource_url(context, 'journal') }}">
+                Journal
+            </a>
+        </div>
+    <div>
+
+    {% if dossier.titre_loi and dossier.url_loi_promulgation %}
+    <div class="centered">
+        <div class="bloc">Loi promulguée : <a href="{{ dossier.url_loi_promulgation }}" target="_blank"> Loi {{ dossier.titre_loi }}</a></div>
+    </div>
+    {% endif %}
+
+    <div class="bloc">
+        <p>
+            <big>
+                Renseigner ici les adresses courriel des personnes à inviter sur l’ensemble de l’espace de travail relatif à ce dossier législatif.
+            </big>
+        </p>
+        <form
+            method="post"
+            action="{{ request.resource_url(context, 'invite_') }}"
+            data-controller="dossier-invite"
+            data-target="dossier-invite.form">
+            <input type="hidden" name="origin" value="gestion">
+            <div class="form-group">
+                <label for="emails">
+                    Transmettre une invitation à :
+                    <small>Passer à la ligne entre chaque adresse courriel.</small>
+                </label>
+                <textarea
+                    name="emails" class="form-control" rows="10"
+                    data-action="paste->dossier-invite#clean"></textarea>
+            </div>
+            <div class="form-group save-buttons">
+                <input type="submit" name="contributor" value="Inviter en tant que Contributeur" data-action="click->dossier-invite#addContributor" class="button primary enabled">
+                <input type="submit" name="coordinator" value="Inviter en tant que Coordinateur" data-action="click->dossier-invite#addCoordinator" class="button primary">
+            </div>
+        </form>
+    </div>
+
+    <div class="bloc list-bloc">
+        <a class="button primary export" href="{{ request.resource_url(context, 'export_team_xls' )}}">Exporter les utilisateurs au format Excel</a>
+        <details>
+            <summary><big><u>Liste des utilisateurs invités sur le dossier</u></big></summary>
+
+            <table class="table">
+                <caption>Tableau répertoriant tous les utilisateurs ayant accès à ce dossier ainsi que leur rôle respectif.</caption>
+                <thead>
+                    <tr>
+                        <th class="radius-left">Nom</th>
+                        <th>Email</th>
+                        <th>Rôle</th>
+                        <th class="radius-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+            {% for user in team.users %}
+                  <tr>
+                      <td>{% if user.name %}{{ user.name }}{% endif %}</td>
+                      <td>{{ user.email }}</td>
+                      <td>{{ user.get_role( user, team ) }}</td>
+                      <td>
+                      <ul>
+                      {% if team.is_coordinator( user ) %}
+                      <li>
+                      <form
+                          method="post"
+                          action="{{ request.resource_url(context, 'set_contributeur') }}">
+                          <input type="hidden" name="pk" value="{{ user.pk }}">
+                          <div>
+                          {% if not user.is_admin %}
+                              <input
+                                  type="submit" name="save" value="Passer en Contributeur"
+                                  class="button primary enabled fixed-width">
+                          {% else %}
+                              <input
+                                  type="submit" name="save" value="Retirer le rôle Coordinateur"
+                                  class="button primary enabled fixed-width">
+                          {% endif %}
+                          </div>
+                      </form>
+                      </li>
+                      {% else %}
+                      <li>
+                      <form
+                          method="post"
+                          action="{{ request.resource_url(context, 'set_coordinateur') }}">
+                          <input type="hidden" name="pk" value="{{ user.pk }}">
+                          <div>
+                          {% if not user.is_admin %}
+                              <input
+                                  type="submit" name="save" value="Passer en Coordinateur"
+                                  class="button primary fixed-width">
+                          {% else %}
+                              <input
+                                  type="submit" name="save" value="Ajouter le rôle Coordinateur"
+                                  class="button primary fixed-width">
+                          {% endif %}
+                          </div>
+                      </form>
+                      </li>
+                      {% endif %}
+                      {% if not user.is_admin %}
+                      <li>
+                      <form
+                          method="post"
+                          action="{{ request.resource_url(context, 'retrait') }}"
+                          data-controller="dossier-retrait">
+                          <input type="hidden" name="pk" value="{{ user.pk }}">
+                          <div>
+                              <input
+                                  type="submit" name="save" value="Retirer du dossier"
+                                  class="button danger fixed-width"
+                                  data-action="dossier-retrait#delete">
+                          </div>
+                      </form>
+                      </li>
+                      {% endif %}
+                      </ul>
+                      </td>
+                  </tr>
+            {% endfor %}
+                </tbody>
+            </table>
+        </details>
+    </div>
+
+    <div class="bloc list-bloc">
+        <a class="button primary export" href="{{ request.resource_url(context, 'export_urls_xls' )}}">Exporter les liens au format Excel</a>
+        <details>
+            <summary><big><u>Alimentation des données</u></big></summary>
+            <table class="table table-urls">
+                <caption>
+                    Tableau répertoriant les liens utilisés par Signale pour récupérer les données des dossiers et leurs lectures.
+                    Chaque lien affiché ci-contre est dépendant des ressources mises à disposition par l'Assemblée Nationale ou le Sénat, nous ne pouvons donc garantir leur existence.
+                </caption>
+                <tbody>
+                    <tr>
+                        <td class="titre_lecture" colspan="2">Identifiant AN du dossier</td>
+                        <td>{{ dossier.an_id or "" }}</td>
+                    </tr>
+                    <tr>
+                        <td class="titre_lecture" colspan="2">Identifiant Sénat du dossier</td>
+                        <td>{{ dossier.senat_id or "" }}</td>
+                    </tr>
+                    <tr>
+                        <td class="titre_lecture" colspan="2">{{ "Open Data" if dossier.an_id else "Flux XML" }}</td>
+                        <td><a href="{{ url_data }}">{{ url_data }}</a></td>
+                    </tr>
+                    {% for lecture in lectures %}
+                        <tr>
+                            <td class="titre_lecture" rowspan="{% if lecture.is_discuss %}{% if lecture.missions %}5{% else %}4{% endif%}{% else %}2{% endif %}">
+                                {{ lecture.chambre }}, {{ lecture.organe }}
+                                <p>{{ lecture.phase }}, {{ lecture.libelle_texte }}</p>
+                            </td>
+                            <td class="bg-grey">Texte</td>
+                            <td><a href="{{ lecture.link_texte }}">{{ lecture.link_texte }}</a></td>
+                        </tr>
+                        <tr>
+                            <td class="bg-grey">Dérouleur</td>
+                            <td><a href="{{ lecture.link_derouleur }}">{{ lecture.link_derouleur }}</a></td>
+                        </tr>
+                        {% if lecture.missions %}
+                            <tr>
+                                <td class="bg-grey">Missions</td>
+                                <td><a href="{{ lecture.missions }}">{{ lecture.missions }}</a></td>
+                            </tr>
+                        {% endif %}
+                        {% if lecture.is_discuss %}
+                            <tr>
+                                <td class="bg-grey">Ordre discussion HTML</td>
+                                <td>
+                                    {% if lecture.links_discuss|length > 1 %}
+                                        <details>
+                                            <summary>Afficher les {{ lecture.links_discuss|length }} liens</summary>
+                                            {% for link in lecture.links_discuss %}
+                                            <a href="{{ link }}.html">{{ link }}.html</a>
+                                            {% endfor %}
+                                        </details>
+                                    {% else %}
+                                        {% for link in lecture.links_discuss %}
+                                        <a href="{{ link }}.html">{{ link }}.html</a>
+                                        {% endfor %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="bg-grey">Ordre discussion JSON</td>
+                                <td>
+                                    {% if lecture.links_discuss|length > 1 %}
+                                        <details>
+                                            <summary>Afficher les {{ lecture.links_discuss|length }} liens</summary>
+                                            {% for link in lecture.links_discuss %}
+                                            <a href="{{ link }}.json">{{ link }}.json</a>
+                                            {% endfor %}
+                                        </details>
+                                    {% else %}
+                                        {% for link in lecture.links_discuss %}
+                                        <a href="{{ link }}.json">{{ link }}.json</a>
+                                        {% endfor %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </details>
+    </div>
+
+    <div class="bloc list-bloc">
+        <details>
+            <summary><big><u>Rafraîchissement étendu</u></big></summary>
+            <table class="table table-urls">
+                <caption>Tableau permettant de mettre à jour chaque lecture AN avec un plus grand nombre d'écart entre amendements déterminé dans le fichier de paramètres de l'application.</caption>
+                <tbody>
+                    {% for lecture in lectures if lecture.chambre == "Assemblée nationale" %}
+                    <tr>
+                        <td class="titre_lecture">
+                            {{ lecture.chambre }}, {{ lecture.organe }}
+                            <p>{{ lecture.phase }}, {{ lecture.libelle_texte }}</p>
+                        </td>
+                        <td class="maj-button">
+                            <form method="post" action="{{ request.resource_url(context, 'gestion') }}">
+                                <input name="lecture" type="hidden" value="{{ lecture.pk }}" />
+                                <input name="maj-lecture" type="submit" value="Mettre à jour" class="button primary" />
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </details>
+    </div>
+
+    <div class="bloc box">
+        <h4>Archivage du dossier</h4>
+        <div class="actions-buttons">
+            {% if dossier.team.active %}
+            Le dossier est activé :
+            {% else %}
+            Le dossier est archivé :
+            {% endif %}
+            <form
+                method="post"
+                action="{{ request.resource_url(context, 'archive') }}"
+                class="archive-form"
+                data-controller="dossier-archive">
+                <input type="submit" name="save"
+                    value="{% if dossier.team.active %}Archiver le dossier{% else %}Réactiver le dossier{% endif %}"
+                    class="button primary fixed-width {% if not dossier.team.active %}enabled{% endif %}">
+            </form>
+        </div>
+    </div>
+
+    <div class="bloc box">
+        <h4>Suppression du dossier</h4>
+        <form method="post" action="{{ request.resource_url(context) }}" id="delete-dossier" data-controller="dossier-item" class="actions-buttons">
+            <input type="submit" name="submit-delete-dossier"
+                   data-action="dossier-item#delete"
+                   class="danger allow-multiple-submit button fixed-width"
+                   value="Supprimer le dossier">
+        </form>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ request.static_url('zam_repondeur:static/js/dossiers.js') }}"></script>
+{% endblock %}
